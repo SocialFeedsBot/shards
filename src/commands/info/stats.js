@@ -28,7 +28,7 @@ module.exports = class extends Command {
         fields: [
           {
             name: 'General',
-            value: `:white_small_square: Guilds: ${guilds.toLocaleString()} (${unavailableGuilds} unavailable)\n:white_small_square: Channels: ${channels.toLocaleString()}\n:white_small_square: Worker memory: ${this.convertMem(process.memoryUsage().rss)}`,
+            value: `:white_small_square: Guilds: ${guilds.toLocaleString()} (${unavailableGuilds} unavailable)\n:white_small_square: Channels: ${channels.toLocaleString()}\n:white_small_square: Worker memory: ${this.convertMem(process.memoryUsage().heapUsed)}`,
             inline: true
           },
           {
