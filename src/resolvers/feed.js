@@ -10,11 +10,13 @@ module.exports = (worker, message, input) => {
     feed = 'rss';
   } else if (['reddit'].includes(input.toLowerCase())) {
     feed = 'reddit';
+  } else if (['discord', 'discordstatus'].includes(input.toLowerCase())) {
+    feed = 'discordstatus';
   }
 
   if (feed) {
     return feed;
   } else {
-    throw new Error('Invalid feed type, use one of the following: `youtube`, `reddit`, `twitter`, `twitch`, `rss`');
+    throw new Error('Invalid feed type, use one of the following: `youtube`, `reddit`, `twitter`, `twitch`, `discordstatus` or `rss`');
   }
 };

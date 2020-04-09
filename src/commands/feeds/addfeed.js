@@ -7,8 +7,8 @@ module.exports = class extends Command {
   constructor(...args) {
     super(...args, {
       description: stripIndents`Adds a new feed for the server.\n
-        \`type\` can consist of either rss, reddit, twitch, twitter or youtube.\n
-        \`feed url\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name.\n
+        \`type\` can consist of either rss, reddit, twitch, discordstatus, twitter or youtube.\n
+        \`feed url\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name, or 'discord' if you used discordstatus as the type.\n
         \`channel\` must be the channel where you want the feed. The channel can always be changed by setting the channel of the webhook the bot creates.`,
       aliases: ['add'],
       args: [{ type: 'feed', label: 'type' }, { type: 'text', label: 'feed url' }, { type: 'channel' }],
