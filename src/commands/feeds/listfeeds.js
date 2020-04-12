@@ -47,7 +47,7 @@ module.exports = class extends Command {
       }));
 
       final.filter(f => f).map(async (feed, i) => {
-        msg = msg += `\n**Channel <#${feed[0].channelID}>**\n${feed.map(f => this.feedType(f)).join('\n\t')}`;
+        msg = msg += `\n**Channel <#${feed[0].channelID}>**\n\t${feed.map(f => this.feedType(f)).join('\n\t')}`;
         // fields.push({ name: `#${guild.channels.get(feed[0].channelID).name}`, value: feed.map(f => this.feedType(f)).join('\n') });
       });
 
@@ -61,7 +61,8 @@ module.exports = class extends Command {
       twitch: `<:twitch:644633161401368577> <https://twitch.tv/${feed.url}>`,
       twitter: `<:twitter:644633161212624946> <https://twitter.com/${feed.url}>`,
       rss: `<:rss:644633161933914122> <(${feed.url}>`,
-      reddit: `<:reddit:648124175378284544> <https://reddit.com/r/${feed.url}>`
+      reddit: `<:reddit:648124175378284544> <https://reddit.com/r/${feed.url}>`,
+      discordstatus: '<:discord:698945805163429898> <https://status.discordapp.com>'
     }[feed.type];
   }
 
