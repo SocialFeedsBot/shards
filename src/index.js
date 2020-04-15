@@ -37,7 +37,11 @@ class Worker {
     while (true) {
       const event = await this.redis.blpop('sharder', '30');
       if (event) {
-        await this.handleEvent(JSON.parse(event[1]));
+        try {
+          await this.handleEvent(JSON.parse(event[1]));
+        } catch(e) {
+          logger.error(e);
+        }
       }
     }
   }
