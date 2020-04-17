@@ -2,6 +2,7 @@
 
 const config = require('../config');
 const Redis = require('ioredis');
+const amqp = require('amqplib');
 const State = require('state-manager');
 
 const Rest = require('./rest/');
@@ -33,17 +34,11 @@ class Worker {
   }
 
   async run() {
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const event = await this.redis.blpop('sharder', '30');
-      if (event) {
-        try {
-          await this.handleEvent(JSON.parse(event[1]));
-        } catch(e) {
-          logger.error(e);
-        }
-      }
-    }
+    const connection = await amqp.connect(config.amqp);
+    const channel = await connection.createChannel();
+
+    channel.assertQueue('discordfeeds', { durable: false });
+    channel.consume('discordfeeds', (msg) => this.handleEvent(JSON.parse(msg.content.toString())), { noAck: true });
   }
 
   async handleEvent(event) {

@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "amqplib": "^0.5.5",
     "axios": "^0.19.2",
     "common-tags": "^1.8.0",
     "form-data": "^3.0.0",
