@@ -39,6 +39,10 @@ class Worker {
 
     channel.assertQueue('discordfeeds', { durable: false });
     channel.consume('discordfeeds', (msg) => this.handleEvent(JSON.parse(msg.content.toString())), { noAck: true });
+
+    setInterval(async () => {
+      await this.redis.set(`worker:${process.env.NODE_APP_INSTANCE || process.pid}`, Date.now());
+    }, 4000);
   }
 
   async handleEvent(event) {
