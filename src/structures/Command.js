@@ -1,10 +1,10 @@
 module.exports = class Command {
 
-  constructor(name, category, options) {
+  constructor(name, category, options = {}) {
     this.name = name;
     this.category = category;
 
-    this.description = options.description;
+    this.description = options.description || 'None provided.';
     this.args = options.args || [];
     this.aliases = options.aliases || [];
     this.hidden = !!options.hidden;

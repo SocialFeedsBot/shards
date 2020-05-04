@@ -18,7 +18,7 @@ module.exports = class Message {
 
   static async setup(state, data) {
     const channel = await state.channels.get(data.channel_id);
-    if (!channel) throw new Error('No channel');
+    if (!channel) return null;
 
     let guild;
     let author;

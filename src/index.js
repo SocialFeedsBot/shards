@@ -50,6 +50,7 @@ class Worker {
       case 'MESSAGE_CREATE': {
         if (event.d.author.bot) return;
         const message = await Message.setup(this.state, event.d);
+        if (!message) return;
         const user = await this.state.users.get('self');
 
         const prefixRegex = new RegExp(`^(<@!?${user.selfID}>|${config.prefix.replace(/[.*+?^${}()|[\]\\]/g, 'g')})( *)?`);
