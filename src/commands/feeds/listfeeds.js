@@ -44,7 +44,9 @@ module.exports = class extends Command {
       }));
 
       final.map(async (feed, i) => {
-        embed.addField(`#${guild.channels.get(feed[0].channelID).name}`, feed.map(f => this.feedType(f)).join('\n'));
+        if (feed.length) {
+          embed.addField(`#${guild.channels.get(feed[0].channelID).name}`, feed.map(f => this.feedType(f)).join('\n'));
+        }
       });
 
       embed.send();
