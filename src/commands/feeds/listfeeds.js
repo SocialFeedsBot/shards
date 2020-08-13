@@ -59,7 +59,8 @@ module.exports = class extends Command {
       twitch: `<:twitch:644633161401368577> [${feed.url}](https://twitch.tv/${feed.url})`,
       twitter: `<:twitter:644633161212624946> [${feed.url}](https://twitter.com/${feed.url})`,
       rss: `<:rss:644633161933914122> [${feed.url}](${feed.url})`,
-      reddit: `<:reddit:648124175378284544> [${feed.url}](https://reddit.com/r/${feed.url})`
+      reddit: `<:reddit:648124175378284544> [${feed.url}](https://reddit.com/r/${feed.url})`,
+      discordstatus: '<:discord:698945805163429898> <https://status.discordapp.com>'
     }[feed.type];
   }
 
