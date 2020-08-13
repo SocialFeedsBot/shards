@@ -1,81 +1,92 @@
-/* WORKER */
-
+/* Constants */
 const config = require('../config');
-const Redis = require('ioredis');
-const amqp = require('amqplib');
-const State = require('state-manager');
+const Eris = require('eris');
+const GatewayClient = require('./gateway/GatewayClient');
+const fs = require('fs');
+const path = require('path');
+require('eris-additions')(Eris, { enabled: ['Channel.awaitMessages', 'User.tag', 'Member.tag', 'Member.highestRole', 'Guild.me'] });
 
-const Rest = require('./rest/');
-const CommandModule = require('./modules/Command');
+// Modules
 const APIModule = require('./modules/API');
+const CommandModule = require('./modules/Commands');
 
-const Message = require('./rest/structures/Message');
+const Logger = require('./logger');
+const logger = new Logger('Main', [config.token, config.gateway.secret || undefined]);
 
-const { Logger } = require('./logger/');
-const logger = new Logger('Worker', { sensitive: [config.token] });
+class DiscordFeeds extends Eris.Client {
 
-class Worker {
+  constructor(gateway, clusterID, shardStart, shardEnd, shardCount) {
+    super(config.token, {
+      defaultImageFormat: 'png',
+      defaultImageSize: 1024,
+      intents: ['guilds', 'guildMessages', 'guildMembers', 'directMessages'],
+      firstShardID: shardStart,
+      lastShardID: shardEnd,
+      maxShards: shardCount,
+      restMode: true,
+      messageLimit: 100,
+      getAllUsers: true
+    });
 
-  constructor() {
+    this.gatewayClient = gateway;
+    this.clusterID = clusterID;
     this.config = config;
     this.logger = logger;
+    this.logger.extension('Gateway').debug(`Assigned cluster ${clusterID}, shards ${shardStart}-${shardEnd}/${shardCount}.`);
 
-    this.redis = new Redis(config.redis);
-    this.state = new State(this.redis, config.databaseURL, ['guilds', 'channels', 'roles', 'users', 'members']);
-    this.rest = new Rest(this.config.token, this.state);
-
+    this.api = new APIModule(config.api);
     this.commands = new CommandModule(this);
-    this.api = new APIModule(this.config.apiURL, config.jwtSecret);
-    this.startedAt = Date.now();
+
+    gateway
+      .on('debug', (msg) => logger.extension('Gateway').debug(msg))
+      .on('request', async (id, data) => {
+        try {
+          let res = await eval(data.input);
+          gateway.resolve(id, res);
+        } catch(err) {
+          gateway.resolve(id, err.stack);
+        }
+        return undefined;
+      });
   }
 
-  get uptime() {
-    return Date.now() - this.startedAt;
+  async init() {
+    // await this.database.connect();
+    fs.readdirSync(path.resolve('src/events')).forEach((event) => {
+      this.on(event.replace('.js', ''), (...args) => require(`./events/${event}`)(this, ...args));
+    });
+
+    this.commands.load();
+
+    const gw = await this.getBotGateway();
+    this.logger.debug(`Recommended shards: ${gw.shards} | Total sessions: ${gw.session_start_limit.total} | Remaining: ${gw.session_start_limit.remaining}`);
+
+    this.connect();
   }
 
-  async run() {
-    const connection = await amqp.connect(config.amqp);
-    const channel = await connection.createChannel();
-
-    channel.assertQueue('discordfeeds', { durable: false });
-    channel.consume('discordfeeds', (msg) => this.handleEvent(JSON.parse(msg.content.toString())), { noAck: true });
-
-    setInterval(async () => {
-      await this.redis.set(`worker:${process.env.NODE_APP_INSTANCE || process.pid}`, Date.now());
-    }, 4000);
-  }
-
-  async handleEvent(event) {
-    switch(event.t) {
-      case 'MESSAGE_CREATE': {
-        if (event.d.author.bot) return;
-        const message = await Message.setup(this.state, event.d);
-        if (!message) return;
-        const user = await this.state.users.get('self');
-
-        const prefixRegex = new RegExp(`^(<@!?${user.selfID}>|${config.prefix.replace(/[.*+?^${}()|[\]\\]/g, 'g')})( *)?`);
-        const match = message.content.match(prefixRegex);
-        if (!match) return;
-        const prefix = match[0];
-
-        const content = message.content = message.content.substring(prefix.length);
-        let command = content.split(' ')[0];
-        command = command.toLowerCase().trim();
-
-        const found = this.commands.get(command) || this.commands.find((cmd) => cmd.aliases.indexOf(command) !== -1);
-        if (!found) return;
-
-        if (found.category === 'admin' && !this.config.owners.includes(message.author.id)) return;
-
-        await this.commands.execute(message, found);
-      }
+  async getUser(id) {
+    if (this.users.get(id)) {
+      return this.users.get(id);
+    } else {
+      return await this.getRESTUser(id);
     }
   }
 
 }
 
-new Worker().run();
-
-process.on('unhandledRejection', (error) => {
-  logger.error(`Unhandled Rejection: ${error.stack}`);
+process.on('unhandledRejection', (e) => {
+  logger.error('Unhandled rejection:', e.stack);
+}).on('uncaughtException', (e) => {
+  logger.error('Unhandled exception:', e.stack);
 });
+
+const worker = new GatewayClient(config.gateway);
+
+worker
+  .on('error', (err) => logger.extension('Gateway').error(err))
+  .on('connect', (ms) => logger.extension('Gateway').info(`Connected in ${ms}ms`))
+  .on('ready', (clusterID, shardStart, shardEnd, shardCount) => {
+    new DiscordFeeds(worker, clusterID, shardStart, shardEnd, shardCount).init();
+  });
+
+worker.connect();

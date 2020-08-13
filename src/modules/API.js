@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken');
 
 module.exports = class APIModule {
 
-  constructor(apiURL, jwtSecret) {
-    this._apiURL = apiURL;
-    this._auth = jwt.sign({ id: '', bot: true }, jwtSecret, { algorithm: 'HS256' });
+  constructor({ url, secret }) {
+    this._apiURL = url;
+    this._auth = jwt.sign({ id: '', bot: true }, secret, { algorithm: 'HS256' });
   }
 
   getAllFeeds() {

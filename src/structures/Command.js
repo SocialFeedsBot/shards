@@ -15,7 +15,7 @@ module.exports = class Command {
     this.usage = this.args.map((arg) => `${arg.optional ? '[' : '<'}${arg.label || arg.type}${arg.optional ? ']' : '>'}`).join(' ');
   }
 
-  run(context) {
+  run() {
     throw new Error(`Run function for ${this.name} command not implemented.`);
   }
 

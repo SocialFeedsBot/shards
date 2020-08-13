@@ -1,45 +1,56 @@
 const Command = require('../../structures/Command');
-const moment = require('moment');
-
-require('moment-duration-format');
+const { stripIndents } = require('common-tags');
 
 module.exports = class extends Command {
 
   constructor(...args) {
     super(...args, {
-      description: 'Advanced statistics of DiscordFeeds.'
+      description: 'View some potentially useful statistics.',
+      args: [{ type: 'text', label: 'command', optional: true }]
     });
   }
 
-  async run(context) {
-    const guilds = await context.worker.state.guilds.count();
-    const unavailableGuilds = (await context.worker.state.guilds.getAll()).filter((g) => g.unavailable).length;
-    const channels = await context.worker.state.channels.count();
+  async run({ client, reply, guild }) {
+    const stats = {
+      guilds: client.guilds.size,
+      users: client.users.size,
+      ram: process.memoryUsage().heapUsed,
+      clusterID: client.clusterID,
+      clusterCount: 1,
+      shardCount: client.options.maxShards,
+      uptime: client.uptime
+    };
 
-    const { body: feeds, success } = await context.worker.api.getAllFeeds();
-    const { body: thisServer, success: otherSuccess } = context.guild ? await context.worker.api.getGuildFeeds(context.guild.id) : { success: false, body: null };
+    const { body: feeds, success } = await client.api.getAllFeeds();
+    const { body: thisServer, success: otherSuccess } = guild ? await client.api.getGuildFeeds(guild.id) : { success: false, body: null };
 
-    const user = await context.worker.state.users.get('self');
+    if (client.gatewayClient.connected) {
+      const guilds = await client.gatewayClient.request({ t: 'cluster', id: 'all' }, 'this.guilds.size');
+      const users = await client.gatewayClient.request({ t: 'cluster', id: 'all' }, 'this.users.size');
+      const ram = await client.gatewayClient.request({ t: 'cluster', id: 'all' }, 'process.memoryUsage().heapUsed');
 
-    context.rest.createMessage(context.channel.id, {
-      embed: {
-        title: 'Statistics',
-        thumbnail: { url: `https://cdn.discordapp.com/avatars/${user.selfID}/${user.avatar}.png` },
-        fields: [
-          {
-            name: 'General',
-            value: `:white_small_square: Guilds: ${guilds.toLocaleString()} (${unavailableGuilds} unavailable)\n:white_small_square: Channels: ${channels.toLocaleString()}\n:white_small_square: Worker memory: ${this.convertMem(process.memoryUsage().heapUsed)}`,
-            inline: true
-          },
-          {
-            name: 'Feeds',
-            value: `:white_small_square: Setup (server): ${otherSuccess ? thisServer.length.toLocaleString() : 'N/A'}\n:white_small_square: Setup (global): ${success ? feeds.length.toLocaleString() : 'N/A'}`,
-            inline: true
-          },
-          { name: 'Uptime', value: moment.duration(context.worker.uptime).format('D[d], H[h], m[m], s[s]'), inline: false }
-        ]
+      if (!guilds.length) {
+        reply('The gateway encountered an error collecting stats.', { success: false });
+        return;
       }
-    });
+
+      stats.guilds = guilds.reduce((a, b) => a + b);
+      stats.users = users.reduce((a, b) => a + b);
+      stats.ram = ram.reduce((a, b) => a + b);
+      stats.clusterCount = guilds.length;
+    }
+
+    reply.withEmbed()
+      .setColour('orange')
+      .setTitle('Statistics')
+      .addField('General', stripIndents`:white_small_square: Guilds: ${stats.guilds.toLocaleString()} (${client.guilds.size.toLocaleString()} this cluster)
+        :white_small_square: Users: ${stats.users.toLocaleString()}
+        :white_small_square: Memory: ${this.convertMem(stats.ram)}`, true)
+      .addField('Feeds', stripIndents`:white_small_square: Setup this server: ${otherSuccess ? thisServer.length.toLocaleString() : 'N/A'}
+        :white_small_square: Setup globally: ${success ? feeds.length.toLocaleString() : 'N/A'}`, true)
+      .setThumbnail(client.user.avatarURL)
+      .setFooter(`Cluster ${client.clusterID}/${stats.clusterCount}`)
+      .send();
   }
 
   convertMem(bytes) {
@@ -51,3 +62,4 @@ module.exports = class extends Command {
   }
 
 };
+

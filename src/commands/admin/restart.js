@@ -1,11 +1,16 @@
 const Command = require('../../structures/Command');
-const { execSync } = require('child_process');
 
 module.exports = class extends Command {
 
-  async run(context) {
-    await context.rest.createMessage(context.channel.id, 'Reloading workers.');
-    execSync('pm2 reload worker');
+  constructor(...args) {
+    super(...args, {
+      args: [{ type: 'text', label: 'target', optional: false }, { type: 'int', label: 'id', optional: true }], hidden: true
+    });
+  }
+
+  async run({ reply, client, args: { target, id } }) {
+    await reply(`Restarting services with type **${target}**`);
+    client.gatewayClient.request({ t: target, ids: [id] }, 'process.exit();');
   }
 
 };

@@ -1,22 +1,25 @@
 const Command = require('../../structures/Command');
+const superagent = require('superagent');
 
 module.exports = class extends Command {
 
   constructor(...args) {
     super(...args, {
-      description: 'Shhh.',
-      args: [{ type: 'text' }]
+      args: [{ type: 'text' }], hidden: true
     });
   }
 
-  async run(context) {
+  async run(ctx) {
+    // eslint-disable-next-line no-unused-vars
+    const { message, reply, args, channel, guild, author, member, client } = ctx;
+    // eslint-disable-next-line no-unused-vars
+    const { get, post } = superagent;
     try {
-      const result = await eval(context.args[0]);
-      context.rest.createMessage(context.channel.id, `Success.\`\`\`js\n${require('util').inspect(result, { depth: 0 })}\n\`\`\``);
+      const result = await eval(args.text);
+      reply(`Success.\`\`\`js\n${require('util').inspect(result, { depth: 0 })}\n\`\`\``);
     } catch(err) {
-      context.rest.createMessage(context.channel.id, `Error.\`\`\`js\n${err.stack}\n\`\`\``);
+      reply(`Error.\`\`\`js\n${err.stack}\n\`\`\``);
     }
-
   }
 
 };

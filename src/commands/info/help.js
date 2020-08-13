@@ -9,30 +9,29 @@ module.exports = class extends Command {
     });
   }
 
-  async run(context) {
-    if (context.args[0]) {
-      const command = context.worker.commands.get(context.args[0].toLowerCase()) || context.worker.commands.find((c) => c.aliases.indexOf(context.args[0].toLowerCase()) !== -1);
-      if (!command || command.hidden) {
-        context.rest.createMessage(context.channel.id, `:grey_exclamation: **Unable to find command** with that name or alias. Run the help command for commands.`);
+  async run({ client, reply, args }) {
+    if (args.command) {
+      const command = client.commands.get(args.command.toLowerCase()) || client.commands.find((c) => c.aliases.indexOf(args.command.toLowerCase()) !== -1);
+      if (!command || command.hidden || command.category === 'admin') {
+        await reply('That command does not exist.', { success: false });
         return;
       }
 
-      context.rest.createMessage(context.channel.id, {
-        embed: {
-          title: `Command Information for ${command.name}`,
-          description: command.description || 'None',
-          fields: [
-            { name: 'Usage', value: `${command.name} ${command.usage}` },
-            { name: 'Requirements', value: 'N/A' },
-            { name: 'Aliases', value: command.aliases.length ? command.aliases.join(', ') : 'None' }
-          ]
-        }
-      });
+      reply.withEmbed()
+        .setColour('orange')
+        .setTitle(`Command info for ${command.name}`)
+        .setDescription(command.description || 'None')
+        .addField('Usage', `${command.name} ${command.usage}`)
+        .addField('Requirements', command.permissions.length ? command.permissions.join(', ') : 'None')
+        .addField('Aliases', command.aliases.length ? command.aliases.join(', ') : 'None')
+        .send();
     } else {
       const categories = {};
-      const fields = [];
+      const embed = reply.withEmbed()
+        .setColour('orange')
+        .setTitle('Commands');
 
-      context.worker.commands.forEach((command) => {
+      client.commands.forEach((command) => {
         if (command.category !== 'admin') {
           if (!categories[command.category]) categories[command.category] = [];
           categories[command.category].push(command.name);
@@ -41,17 +40,10 @@ module.exports = class extends Command {
 
       for (const category in categories) {
         categories[category].sort();
-        fields.push({
-          name: category.charAt(0).toUpperCase() + category.substring(1),
-          value: `\`${categories[category].join('`  `')}\``
-        });
+        embed.addField(category.charAt(0).toUpperCase() + category.substring(1), `\`${categories[category].join('`  `')}\``);
       }
 
-      context.rest.createMessage(context.channel.id, { embed: {
-        title: `DiscordFeeds Commands`,
-        fields: fields
-      } });
-
+      embed.send();
     }
   }
 

@@ -11,33 +11,30 @@ module.exports = class extends Command {
     });
   }
 
-  async run(context) {
-    const { success, message, body: feeds } = await context.worker.api.getGuildFeeds(context.guild.id);
+  async run({ guild, reply, client, args: { page: pageNum } }) {
+    const { success, message, body: feeds } = await client.api.getGuildFeeds(guild.id);
 
     if (!success) {
-      await context.rest.createMessage(context.channel.id, `:warning: **Unexpected error,** please try again later. **[${message}]**`);
+      await reply(`An error occurred, please try again later or report this error to our support server.\n${message}`, { success: false });
       return;
     }
 
     if (!feeds.length) {
-      await context.rest.createMessage(context.channel.id, ':grey_exclamation: **No feeds have been setup** for this server.');
+      await reply('No feeds have been setup for this server.', { success: false });
     } else {
-      let msg = '';
-
       let chunks = [];
       while (feeds.length > 0) chunks.push(feeds.splice(0, 5));
-      let page = Math.min(Math.max(parseInt(context.args[0] || 1), 1), chunks.length) || 1;
+      let page = Math.min(Math.max(parseInt(pageNum || 1), 1), chunks.length) || 1;
+
+      const embed = reply.withEmbed()
+        .setColour('orange')
+        .setTitle(`Feed List - Page ${page}/${chunks.length}`);
 
       const webhooks = [...new Set(chunks[page - 1].map(feed => feed.webhook.token))];
 
       const final = await Promise.all(webhooks.map(async (webhookToken) => {
         const feed = chunks[page - 1].find(f => f.webhook.token === webhookToken);
-        let info;
-        try {
-          info = await context.rest.getWebhook(feed.webhook.id, feed.webhook.token);
-        } catch(e) {
-          return null;
-        }
+        const info = await client.getWebhook(feed.webhook.id, feed.webhook.token);
         return chunks[page - 1]
           .filter(f => f.webhook.id === feed.webhook.id)
           .map(f => {
@@ -46,23 +43,21 @@ module.exports = class extends Command {
           });
       }));
 
-      final.filter(f => f).map(async (feed, i) => {
-        msg = msg += `\n**Channel <#${feed[0].channelID}>**\n\t${feed.map(f => this.feedType(f)).join('\n\t')}`;
-        // fields.push({ name: `#${guild.channels.get(feed[0].channelID).name}`, value: feed.map(f => this.feedType(f)).join('\n') });
+      final.map(async (feed, i) => {
+        embed.addField(`#${guild.channels.get(feed[0].channelID).name}`, feed.map(f => this.feedType(f)).join('\n'));
       });
 
-      await context.rest.createMessage(context.channel.id, `__**Feed List**__\n${msg}`);
+      embed.send();
     }
   }
 
   feedType(feed) {
     return {
-      youtube: `<:youtube:644633161464020993> <https://youtube.com/${feed.url}>`,
-      twitch: `<:twitch:644633161401368577> <https://twitch.tv/${feed.url}>`,
-      twitter: `<:twitter:644633161212624946> <https://twitter.com/${feed.url}>`,
-      rss: `<:rss:644633161933914122> <(${feed.url}>`,
-      reddit: `<:reddit:648124175378284544> <https://reddit.com/r/${feed.url}>`,
-      discordstatus: '<:discord:698945805163429898> <https://status.discordapp.com>'
+      youtube: `<:youtube:644633161464020993> [${feed.url}](https://youtube.com/${feed.url})`,
+      twitch: `<:twitch:644633161401368577> [${feed.url}](https://twitch.tv/${feed.url})`,
+      twitter: `<:twitter:644633161212624946> [${feed.url}](https://twitter.com/${feed.url})`,
+      rss: `<:rss:644633161933914122> [${feed.url}](${feed.url})`,
+      reddit: `<:reddit:648124175378284544> [${feed.url}](https://reddit.com/r/${feed.url})`
     }[feed.type];
   }
 

@@ -1,69 +1,69 @@
 const Command = require('../../structures/Command');
-const superagent = require('superagent');
 const { stripIndents } = require('common-tags');
+const superagent = require('superagent');
 
 module.exports = class extends Command {
 
   constructor(...args) {
     super(...args, {
       description: stripIndents`Adds a new feed for the server.\n
-        \`type\` can consist of either rss, reddit, twitch, discordstatus, twitter or youtube.\n
-        \`feed url\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name, or 'discord' if you used discordstatus as the type.\n
+        \`type\` can consist of either rss, reddit, twitch, twitter or youtube.\n
+        \`feed url\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name.\n
         \`channel\` must be the channel where you want the feed. The channel can always be changed by setting the channel of the webhook the bot creates.`,
+      guildOnly: true,
       aliases: ['add'],
-      args: [{ type: 'feed', label: 'type' }, { type: 'text', label: 'feed url' }, { type: 'channel' }],
-      permissions: ['manageGuild'],
-      botPermissions: ['manageWebhooks'],
-      guildOnly: true
+      args: [{ type: 'feed', label: 'type' }, { type: 'text', label: 'url' }, { type: 'channel' }],
+      permissions: ['manageGuild']
     });
   }
 
-  async run(context) {
-    if (!(await context.args[2].permissionsOf(context.worker.state, context.guild, context.member)).has('readMessages')) {
-      await context.rest.createMessage(context.channel.id, `:grey_exclamation: **You cannot see that channel** therefore you cannot setup feeds for it.`);
+  async run({ args, author, guild, reply, client }) {
+    if (!guild.me.permission.has('manageWebhooks')) {
+      await reply('I require the `Manage Webhooks` permisison to create webhooks.', { success: false });
       return;
     }
 
-    if (context.args[1].includes('reddit') && context.args[0] !== 'reddit') {
-      await context.rest.createMessage(context.channel.id, `:information_source: Please use the **reddit** type instead of **${context.args[0]}** for subreddits.`);
+    if (!args.channel.permissionsOf(author.id).has('readMessages')) {
+      await reply('You are unable to see this channel.', { success: false });
       return;
     }
 
-    const webhook = await this.createWebhook(context.worker, context.args[2].id);
+    if (args.url.includes('reddit') && args.type !== 'reddit') {
+      await reply(`Please use the **reddit** type instead of **${args.type}**`, { success: false });
+      return;
+    }
 
-    const { success, message } = await context.worker.api.createNewFeed(context.guild.id, {
-      feed: { url: context.args[1], type: context.args[0] },
+    const webhook = await this.createWebhook(client, args.channel.id);
+    const { success, message } = await client.api.createNewFeed(guild.id, {
+      feed: { url: args.url, type: args.type },
       webhook: { id: webhook.id, token: webhook.token }
     });
 
     if (!success) {
-      await context.rest.createMessage(context.channel.id, `:warning: **Unexpected error,** please try again later. **[${message}]**`);
+      await reply(`An error occurred, please try again later or report this error to our support server.\n${message}`, { success: false });
       return;
     }
 
-    await context.rest.createMessage(context.channel.id, `:white_check_mark: **Feed created,** it will be posted in <#${context.args[2].id}>.`);
+    await reply(`Feed created, it will be posted in ${args.channel.mention}.`, { success: true });
   }
 
-  async createWebhook(worker, channelID) {
-    const { selfID } = await worker.state.users.get('self');
-    const webhooks = await worker.rest.getChannelWebhooks(channelID);
+  async createWebhook(client, channelID) {
+    const webhooks = await client.getChannelWebhooks(channelID);
     if (webhooks.length) {
-      const webhook = webhooks.find(hook => hook.user.id === selfID);
+      const webhook = webhooks.find(hook => hook.user.id === client.user.id);
       if (webhook) {
         return webhook;
       }
     }
 
-    const user = await worker.state.users.get('self');
-    const { body } = await superagent.get(`https://cdn.discordapp.com/avatars/${user.selfID}/${user.avatar}.png`)
+    const { body } = await superagent.get(client.user.dynamicAvatarURL('png'))
       .catch(err => console.error(err));
     const avatar = `data:image/png;base64,${body.toString('base64')}`;
 
-    return worker.rest.createChannelWebhook(channelID, {
+    return client.createChannelWebhook(channelID, {
       name: 'DiscordFeeds',
       avatar: avatar
-    });
+    }, 'Create Feed Webhook');
   }
-
 
 };

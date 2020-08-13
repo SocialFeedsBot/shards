@@ -1,4 +1,4 @@
-module.exports = (worker, message, input) => {
+module.exports = (client, message, input) => {
   let feed;
   if (['yt', 'youtube'].includes(input.toLowerCase())) {
     feed = 'youtube';

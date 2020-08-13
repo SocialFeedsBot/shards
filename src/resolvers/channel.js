@@ -1,10 +1,7 @@
-const Channel = require('../rest/structures/Channel');
-
-module.exports = async (worker, message, input) => {
+module.exports = async (client, message, input) => {
   if (input.match(/<#(\d{17,21})>/)) input = input.match(/<#(\d{17,21})>/)[1];
 
-  const channels = (await worker.state.channels.getAll()).filter(c => c.guildID === message.guild.id).map(channel => new Channel(channel));
-  const found = channels
+  const found = message.channel.guild.channels
     .filter(ch => ch.type === 0)
     .filter(ch => input === ch.id ||
         input.toLowerCase() === ch.name.toLowerCase() ||
