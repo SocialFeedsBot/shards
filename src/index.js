@@ -39,6 +39,7 @@ class DiscordFeeds extends Eris.Client {
 
     gateway
       .on('debug', (msg) => logger.extension('Gateway').debug(msg))
+      .on('requestSharedGuilds', packet => gateway.sendSharedGuilds(packet, packet.d.guilds.filter(id => this.guilds.get(id))))
       .on('request', async (id, data) => {
         try {
           let res = await eval(data.input);

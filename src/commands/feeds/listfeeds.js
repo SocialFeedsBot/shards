@@ -32,15 +32,10 @@ module.exports = class extends Command {
 
       const webhooks = [...new Set(chunks[page - 1].map(feed => feed.webhook.token))];
 
-      const final = await Promise.all(webhooks.map(async (webhookToken) => {
+      const final = await Promise.all(webhooks.map((webhookToken) => {
         const feed = chunks[page - 1].find(f => f.webhook.token === webhookToken);
-        const info = await client.getWebhook(feed.webhook.id, feed.webhook.token);
         return chunks[page - 1]
-          .filter(f => f.webhook.id === feed.webhook.id)
-          .map(f => {
-            f.channelID = info.channel_id;
-            return f;
-          });
+          .filter(f => f.webhook.id === feed.webhook.id);
       }));
 
       final.map(async (feed, i) => {

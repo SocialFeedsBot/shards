@@ -100,6 +100,11 @@ class Worker extends EventEmitter {
         break;
       }
 
+      case OPCodes.REQUEST_SHARED_GUILDS: {
+        this.emit('requestSharedGuilds', packet);
+        break;
+      }
+
       case OPCodes.SHUTDOWN: {
         process.exit();
         break;
@@ -120,6 +125,11 @@ class Worker extends EventEmitter {
   resolve(id, data) {
     if (!this.connected) return;
     this.send(OPCodes.RESOLVE, { result: data }, { id });
+  }
+
+  sendSharedGuilds(packet, result) {
+    if (!this.connected) return;
+    this.send(OPCodes.REQUEST_SHARED_GUILDS, { result }, { id: packet.id });
   }
 
   heartbeat() {

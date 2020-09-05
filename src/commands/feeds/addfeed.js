@@ -1,6 +1,5 @@
 const Command = require('../../structures/Command');
 const { stripIndents } = require('common-tags');
-const superagent = require('superagent');
 
 module.exports = class extends Command {
 
@@ -18,11 +17,6 @@ module.exports = class extends Command {
   }
 
   async run({ args, author, guild, reply, client }) {
-    if (!guild.me.permission.has('manageWebhooks')) {
-      await reply('I require the `Manage Webhooks` permisison to create webhooks.', { success: false });
-      return;
-    }
-
     if (!args.channel.permissionsOf(author.id).has('readMessages')) {
       await reply('You are unable to see this channel.', { success: false });
       return;
@@ -33,11 +27,7 @@ module.exports = class extends Command {
       return;
     }
 
-    const webhook = await this.createWebhook(client, args.channel.id);
-    const { success, message } = await client.api.createNewFeed(guild.id, {
-      feed: { url: args.url, type: args.type },
-      webhook: { id: webhook.id, token: webhook.token }
-    });
+    const { success, message } = await client.api.createNewFeed(guild.id, { url: args.url, type: args.type, channelID: args.channel.id });
 
     if (!success) {
       await reply(`An error occurred, please try again later or report this error to our support server.\n${message}`, { success: false });
@@ -45,25 +35,6 @@ module.exports = class extends Command {
     }
 
     await reply(`Feed created, it will be posted in ${args.channel.mention}.`, { success: true });
-  }
-
-  async createWebhook(client, channelID) {
-    const webhooks = await client.getChannelWebhooks(channelID);
-    if (webhooks.length) {
-      const webhook = webhooks.find(hook => hook.user.id === client.user.id);
-      if (webhook) {
-        return webhook;
-      }
-    }
-
-    const { body } = await superagent.get(client.user.dynamicAvatarURL('png'))
-      .catch(err => console.error(err));
-    const avatar = `data:image/png;base64,${body.toString('base64')}`;
-
-    return client.createChannelWebhook(channelID, {
-      name: 'DiscordFeeds',
-      avatar: avatar
-    }, 'Create Feed Webhook');
   }
 
 };
