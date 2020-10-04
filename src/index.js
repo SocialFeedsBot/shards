@@ -24,8 +24,8 @@ class DiscordFeeds extends Eris.Client {
       lastShardID: shardEnd,
       maxShards: shardCount,
       restMode: true,
-      messageLimit: 100,
-      getAllUsers: true
+      messageLimit: 0,
+      getAllUsers: false
     });
 
     this.gatewayClient = gateway;
