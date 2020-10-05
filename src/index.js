@@ -65,14 +65,6 @@ class DiscordFeeds extends Eris.Client {
     this.connect();
   }
 
-  async getUser(id) {
-    if (this.users.get(id)) {
-      return this.users.get(id);
-    } else {
-      return await this.getRESTUser(id);
-    }
-  }
-
 }
 
 process.on('unhandledRejection', (e) => {
