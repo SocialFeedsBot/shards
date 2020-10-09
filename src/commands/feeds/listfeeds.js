@@ -22,10 +22,6 @@ module.exports = class extends Command {
     if (!docs.length) {
       await reply('No feeds have been setup for this server.', { success: false });
     } else {
-      /*
-      [{ type url, channelID, webhook: { id, token } }]
-       */
-
       // Put the feeds into an array by channel ID.
       let feeds = {};
       docs.forEach((doc) => {
