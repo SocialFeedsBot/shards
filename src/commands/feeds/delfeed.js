@@ -24,8 +24,9 @@ module.exports = class extends Command {
 
     const webhook = (await args.channel.getWebhooks()).find(hook => hook.user.id === client.user.id);
     const { success, message } = await client.api.deleteFeed(guild.id, {
-      feed: { url: args.url, type: args.type },
-      webhook: { id: webhook.id, token: webhook.token }
+      url: args.url,
+      type: args.type,
+      webhookID: webhook.id
     });
 
     if (!success) {
