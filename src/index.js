@@ -13,13 +13,13 @@ const CommandModule = require('./modules/Commands');
 const Logger = require('./logger');
 const logger = new Logger('Main', [config.token, config.gateway.secret || undefined]);
 
-class DiscordFeeds extends Eris.Client {
+class SocialFeeds extends Eris.Client {
 
   constructor(gateway, clusterID, shardStart, shardEnd, shardCount) {
     super(config.token, {
       defaultImageFormat: 'png',
       defaultImageSize: 1024,
-      intents: ['guilds', 'guildMessages', 'guildMembers', 'directMessages'],
+      intents: ['guilds', 'guildMessages', 'directMessages'],
       firstShardID: shardStart,
       lastShardID: shardEnd,
       maxShards: shardCount,
@@ -79,7 +79,7 @@ worker
   .on('error', (err) => logger.extension('Gateway').error(err))
   .on('connect', (ms) => logger.extension('Gateway').info(`Connected in ${ms}ms`))
   .on('ready', (clusterID, shardStart, shardEnd, shardCount) => {
-    new DiscordFeeds(worker, clusterID, shardStart, shardEnd, shardCount).init();
+    new SocialFeeds(worker, clusterID, shardStart, shardEnd, shardCount).init();
   });
 
 worker.connect();
