@@ -16,7 +16,7 @@ module.exports = class extends Command {
     });
   }
 
-  async run({ args, author, guild, reply, client }) {
+  async run({ args, author, channel, guild, reply, client }) {
     if (!args.channel.permissionsOf(author.id).has('readMessages')) {
       await reply('You are unable to see this channel.', { success: false });
       return;
@@ -27,7 +27,12 @@ module.exports = class extends Command {
       return;
     }
 
-    const { success, message } = await client.api.createNewFeed(guild.id, { url: args.url, type: args.type, channelID: args.channel.id });
+    const { success, message } = await client.api.createNewFeed(guild.id, {
+      url: args.url,
+      type: args.type,
+      channelID: args.channel.id,
+      nsfw: channel.nsfw
+    });
 
     if (!success) {
       await reply(`An error occurred, please try again later or report this error to our support server.\n${message}`, { success: false });
