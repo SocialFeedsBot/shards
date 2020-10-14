@@ -43,11 +43,11 @@ module.exports = class DatadogManager {
    */
   async updateStats() {
     let guilds = await this.client.gatewayClient.request({ t: 'cluster', id: 'all' }, 'this.guilds.size');
-    let feedCount = await this.client.api.getAllFeeds();
+    let { body: feeds } = await this.client.api.getAllFeeds();
     if (!guilds.length) return;
 
     this.gauge('guilds', guilds.reduce((a, b) => a + b));
-    this.gauge('feeds', feedCount.length);
+    this.gauge('feeds', feeds.length);
     this.gauge('memory', process.memoryUsage().heapUsed);
   }
 
