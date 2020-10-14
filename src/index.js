@@ -37,7 +37,7 @@ class SocialFeeds extends Eris.Client {
 
     this.api = new APIModule(config.api);
     this.commands = new CommandModule(this);
-    this.datadog = new DatadogModule(config.datadog);
+    this.datadog = new DatadogModule(this, config.datadog);
 
     gateway
       .on('debug', (msg) => logger.extension('Gateway').debug(msg))
