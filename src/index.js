@@ -9,6 +9,7 @@ require('eris-additions')(Eris, { enabled: ['Channel.awaitMessages', 'User.tag',
 // Modules
 const APIModule = require('./modules/API');
 const CommandModule = require('./modules/Commands');
+const DatadogModule = require('./modules/Datadog');
 
 const Logger = require('./logger');
 const logger = new Logger('Main', [config.token, config.gateway.secret || undefined]);
@@ -36,6 +37,7 @@ class SocialFeeds extends Eris.Client {
 
     this.api = new APIModule(config.api);
     this.commands = new CommandModule(this);
+    this.datadog = new DatadogModule(config.datadog);
 
     gateway
       .on('debug', (msg) => logger.extension('Gateway').debug(msg))
