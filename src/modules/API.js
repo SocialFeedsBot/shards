@@ -8,8 +8,8 @@ module.exports = class APIModule {
     this._auth = jwt.sign({ id: '', bot: true }, secret, { algorithm: 'HS256' });
   }
 
-  getAllFeeds() {
-    return this.request('get', 'feeds');
+  getAllFeeds(query = {}) {
+    return this.request('get', 'feeds', undefined, query);
   }
 
   getGuildFeeds(guildID) {
@@ -24,10 +24,11 @@ module.exports = class APIModule {
     return this.request('delete', 'feeds/delete', { ...data, guildID });
   }
 
-  request(method, path, data) {
+  request(method, path, data, query) {
     return new Promise(resolve => {
       superagent[method](`${this._apiURL}/${path}`)
         .set('Authorization', this._auth)
+        .query(query)
         .send(data)
         .then(result => {
           resolve({ success: true, body: result.body });
