@@ -17,6 +17,6 @@ module.exports = (client, message, input) => {
   if (feed) {
     return feed;
   } else {
-    throw new Error('Invalid feed type, use one of the following: `youtube`, `reddit`, `twitter`, `twitch`, `discordstatus` or `rss`');
+    return null;
   }
 };

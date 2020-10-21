@@ -11,6 +11,6 @@ module.exports = async (client, message, input) => {
     );
 
   if (found.length) return found[0];
-  else throw new Error('No channel found.');
+  else return null;
 };
 

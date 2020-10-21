@@ -108,10 +108,14 @@ module.exports = class CommandsModule extends Collection {
 
       let resolvedArg = await require(`../resolvers/${arg.type}`)(this.client, message, rawArg, arg);
       if (resolvedArg === undefined || resolvedArg === null) {
-        if (arg.optional && (arg.canSkip || rawArg === '')) {
+        if (arg.optional && rawArg === '') {
           resolvedArg = arg.default;
         } else {
-          message.reply(`**Invalid argument provided for ${arg.label || arg.type}**\nTry again using the command as shown: \`${command.name} ${command.usage}\` or use \`help ${command.name}\` for more help.`);
+          message.reply.withEmbed()
+            .setTitle(`Invalid argument provided for **${arg.label || arg.type}**`)
+            .setDescription(`${command.description}\n\n**Usage:** \`${command.name} ${command.usage}\``)
+            .setColour('red')
+            .send();
         }
         return false;
       }

@@ -10,10 +10,10 @@ module.exports = class extends Command {
 
   async run({ reply }) {
     const before = Date.now();
-    const msg = await reply('Pong! **...ms**!');
+    const msg = await reply('Pong! `...ms`');
     const roundtrip = Date.now() - before;
 
-    await msg.edit(`Pong! **${roundtrip}ms**!`);
+    await msg.edit(`Pong \`${roundtrip}ms\``);
   }
 
 };

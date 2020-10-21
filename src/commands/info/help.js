@@ -4,7 +4,7 @@ module.exports = class extends Command {
 
   constructor(...args) {
     super(...args, {
-      description: 'Views a list of commands or extended help on a particular command.',
+      description: 'Views a list of commands or extended help on a particular command.\n\n`command` is the name of the command you want help on.',
       args: [{ type: 'text', label: 'command', optional: true }]
     });
   }
