@@ -8,10 +8,13 @@ module.exports = class extends Command {
       description: stripIndents`Adds a new feed for the server.\n
         \`type\` can consist of either rss, reddit, twitch, twitter or youtube.\n
         \`feed url\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name.\n
-        \`channel\` must be the channel where you want the feed. The channel can always be changed by setting the channel of the webhook the bot creates.`,
+        \`channel\` must be the channel where you want the feed. The channel can always be changed by setting the channel of the webhook the bot creates.
+        
+        **Flags:**
+        \`--include-replies\` this option is to include replies in the Twitter feed.`,
       guildOnly: true,
       aliases: ['add'],
-      args: [{ type: 'feed', label: 'type' }, { type: 'text', label: 'url' }, { type: 'channel' }],
+      args: [{ type: 'feed', label: 'type' }, { type: 'text', label: 'url' }, { type: 'channel' }, { type: 'text', label: 'flags', optional: true}],
       permissions: ['manageGuild']
     });
   }
@@ -27,11 +30,14 @@ module.exports = class extends Command {
       return;
     }
 
+    const includeReplies = (args.flags || '').toLowerCase().includes('--include-replies');
+
     const { success, message } = await client.api.createNewFeed(guild.id, {
       url: args.url,
       type: args.type,
       channelID: args.channel.id,
-      nsfw: channel.nsfw
+      nsfw: channel.nsfw,
+      options: { replies: includeReplies }
     });
 
     if (!success) {
