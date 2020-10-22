@@ -17,11 +17,11 @@ module.exports = class APIModule {
   }
 
   createNewFeed(guildID, data) {
-    return this.request('post', 'feeds/new', { guildID, ...data });
+    return this.request('post', 'feeds', { guildID, ...data });
   }
 
   deleteFeed(guildID, data) {
-    return this.request('delete', 'feeds/delete', { ...data, guildID });
+    return this.request('delete', 'feeds', { ...data, guildID });
   }
 
   request(method, path, data, query) {
@@ -36,9 +36,10 @@ module.exports = class APIModule {
         .catch(err => {
           if (err.message.includes('ECONNREFUSED')) {
             err.message = 'API Offline';
-          } else {
+          } else if (err.response) {
             err.message = err.response.body.error;
           }
+          console.log(err);
           resolve({ success: false, message: err.message });
         });
     });
