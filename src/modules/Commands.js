@@ -106,7 +106,7 @@ module.exports = class CommandsModule extends Collection {
         }
       }
 
-      let resolvedArg = await require(`../resolvers/${arg.type}`)(this.client, message, rawArg, arg);
+      let resolvedArg = await require(`../resolvers/${arg.type}`)(this.client, message, rawArg, arg, args);
       if (resolvedArg === undefined || resolvedArg === null) {
         if (arg.optional && rawArg === '') {
           resolvedArg = arg.default;

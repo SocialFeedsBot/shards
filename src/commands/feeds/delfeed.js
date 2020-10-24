@@ -11,7 +11,7 @@ module.exports = class extends Command {
         \`channel\` must be the channel where you want to remove the feed from.`,
       guildOnly: true,
       aliases: ['rmfeed', 'del', 'rm'],
-      args: [{ type: 'feed', label: 'type' }, { type: 'text', label: 'url' }, { type: 'channel' }],
+      args: [{ type: 'feed', label: 'type' }, { type: 'url' }, { type: 'channel' }],
       permissions: ['manageGuild']
     });
   }

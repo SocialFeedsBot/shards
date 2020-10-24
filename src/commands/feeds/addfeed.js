@@ -14,7 +14,7 @@ module.exports = class extends Command {
         \`--include-replies\` this option is to include replies in the Twitter feed.`,
       guildOnly: true,
       aliases: ['add'],
-      args: [{ type: 'feed', label: 'type' }, { type: 'text', label: 'url' }, { type: 'channel' }, { type: 'text', label: 'flags', optional: true}],
+      args: [{ type: 'feed', label: 'type' }, { type: 'url' }, { type: 'channel' }, { type: 'text', label: 'flags', optional: true }],
       permissions: ['manageGuild']
     });
   }
