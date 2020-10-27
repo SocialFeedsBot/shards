@@ -11,23 +11,8 @@ module.exports = class extends Command {
     });
   }
 
-  async run({ guild, reply, client, args: { page: pageNum } }) {
-    const { success, message, body } = await client.api.getGuildFeeds(guild.id);
-    if (!success) {
-      await reply(`An error occurred, please try again later or report this error to our support server.\n${message}`, { success: false });
-      return;
-    }
-
-    let docs = [];
-    if (body.pages > 1) {
-      docs.push(...body.feeds);
-      for (let i = 0; i < (body.pages - 1); i++) {
-        const { body: { feeds: inPage } } = await client.api.getGuildFeeds(guild.id, { page: i + 2 });
-        if (success) docs.push(...inPage);
-      }
-    } else {
-      docs = body.feeds;
-    }
+  async run({ guild, reply, args: { page: pageNum } }) {
+    const docs = await this.getFeeds(guild.id);
 
     if (!docs.length) {
       await reply('No feeds have been setup for this server.', { success: false });
@@ -74,6 +59,19 @@ module.exports = class extends Command {
       reddit: `<:reddit:648124175378284544> [${feed.url}](https://reddit.com/r/${feed.url})`,
       discordstatus: '<:discord:698945805163429898> [Discord Status](https://discordstatus.com)'
     }[feed.type];
+  }
+
+  async getFeeds(guildID) {
+    let docs = [];
+    let page = 1;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { body: body, success: success } = await this.getGuildFeeds(guildID, { page });
+      if (!success) return docs;
+      docs.push(...body.feeds);
+      page++;
+      if (body.pages >= body.page) return docs;
+    }
   }
 
 };
