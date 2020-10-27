@@ -11,8 +11,8 @@ module.exports = class extends Command {
     });
   }
 
-  async run({ guild, reply, args: { page: pageNum } }) {
-    const docs = await this.getFeeds(guild.id);
+  async run({ guild, reply, client, args: { page: pageNum } }) {
+    const docs = await this.getFeeds(client, guild.id);
 
     if (!docs.length) {
       await reply('No feeds have been setup for this server.', { success: false });
@@ -61,12 +61,12 @@ module.exports = class extends Command {
     }[feed.type];
   }
 
-  async getFeeds(guildID) {
+  async getFeeds(client, guildID) {
     let docs = [];
     let page = 1;
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const { body: body, success: success } = await this.getGuildFeeds(guildID, { page });
+      const { body: body, success: success } = await client.api.getGuildFeeds(guildID, { page });
       if (!success) return docs;
       docs.push(...body.feeds);
       page++;
