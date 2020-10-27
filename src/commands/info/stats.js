@@ -46,8 +46,8 @@ module.exports = class extends Command {
       .addField('General', stripIndents`:white_small_square: Guilds: ${stats.guilds.toLocaleString()} (${client.guilds.size.toLocaleString()} this cluster)
         :white_small_square: Users: ${stats.users.toLocaleString()}
         :white_small_square: Memory: ${this.convertMem(stats.ram)}`, true)
-      .addField('Feeds', stripIndents`:white_small_square: Setup this server: ${otherSuccess ? thisServer.length.toLocaleString() : 'N/A'}
-        :white_small_square: Setup globally: ${success ? feeds.length.toLocaleString() : 'N/A'}`, true)
+      .addField('Feeds', stripIndents`:white_small_square: Setup this server: ${otherSuccess ? thisServer.feedCount.toLocaleString() : 'N/A'}
+        :white_small_square: Setup globally: ${success ? feeds.feedCount.toLocaleString() : 'N/A'}`, true)
       .setThumbnail(client.user.avatarURL)
       .setFooter(`Cluster ${client.clusterID}/${stats.clusterCount}`)
       .send();

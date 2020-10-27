@@ -12,11 +12,21 @@ module.exports = class extends Command {
   }
 
   async run({ guild, reply, client, args: { page: pageNum } }) {
-    const { success, message, body: docs } = await client.api.getGuildFeeds(guild.id);
-
+    const { success, message, body } = await client.api.getGuildFeeds(guild.id);
     if (!success) {
       await reply(`An error occurred, please try again later or report this error to our support server.\n${message}`, { success: false });
       return;
+    }
+
+    let docs = [];
+    if (body.pages > 1) {
+      docs.push(...body.feeds);
+      for (let i = 0; i < (body.pages - 1); i++) {
+        const { body: { feeds: inPage } } = await client.api.getGuildFeeds(guild.id, { page: i + 2 });
+        if (success) docs.push(...inPage);
+      }
+    } else {
+      docs = body.feeds;
     }
 
     if (!docs.length) {
@@ -34,18 +44,20 @@ module.exports = class extends Command {
 
       // Paginate
       let chunks = [];
-      while (feeds.length > 0) chunks.push(feeds.splice(0, 5));
+      while (feeds.length > 0) chunks.push(feeds.splice(0, 2));
       let page = Math.min(Math.max(parseInt(pageNum || 1), 1), chunks.length) || 1;
 
       // Embed
       const embed = reply.withEmbed()
         .setColour('orange')
-        .setTitle(`Feed List - Page ${page}/${chunks.length}`);
+        .setTitle(`Feed List - Page ${page}/${chunks.length}`)
+        .setDescription('Only 10 feeds are shown per channel, to view the full list head to your [dashboard](https://discordfeeds.com/oauth)');
 
       // Populate fields
       chunks[page - 1].forEach((doc) => embed.addField(
-        `#${doc[0].channelName}`,
-        doc.map(f => this.feedType(f)).join('\n')
+        `#${doc[0].channelName} (${doc.length})`,
+        doc.map(f => this.feedType(f)).splice(0, 10).join('\n'),
+        true
       ));
 
       // Send the embed
@@ -60,7 +72,7 @@ module.exports = class extends Command {
       twitter: `<:twitter:644633161212624946> [${feed.url}](https://twitter.com/${feed.url})`,
       rss: `<:rss:644633161933914122> [${feed.url}](${feed.url})`,
       reddit: `<:reddit:648124175378284544> [${feed.url}](https://reddit.com/r/${feed.url})`,
-      discordstatus: '<:discord:698945805163429898> <https://discordstatus.com>'
+      discordstatus: '<:discord:698945805163429898> [Discord Status](https://discordstatus.com)'
     }[feed.type];
   }
 

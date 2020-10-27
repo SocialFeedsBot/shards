@@ -12,8 +12,8 @@ module.exports = class APIModule {
     return this.request('get', 'feeds', undefined, query);
   }
 
-  getGuildFeeds(guildID) {
-    return this.request('get', `feeds/${guildID}`);
+  getGuildFeeds(guildID, query = {}) {
+    return this.request('get', `feeds/${guildID}`, undefined, query);
   }
 
   createNewFeed(guildID, data) {
