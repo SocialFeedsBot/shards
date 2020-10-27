@@ -47,7 +47,7 @@ module.exports = class DatadogManager {
     if (!guilds.length) return;
 
     this.gauge('guilds', guilds.reduce((a, b) => a + b));
-    this.gauge('feeds', feeds.length);
+    this.gauge('feeds', feeds.feedCount);
     this.gauge('memory', process.memoryUsage().heapUsed);
   }
 
