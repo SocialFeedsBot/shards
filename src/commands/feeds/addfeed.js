@@ -31,6 +31,7 @@ module.exports = class extends Command {
     }
 
     const includeReplies = (args.flags || '').toLowerCase().includes('--include-replies');
+    if (args.type === 'twitter') args.url = args.url.toLowerCase();
 
     const { success, message } = await client.api.createNewFeed(guild.id, {
       url: args.url,
