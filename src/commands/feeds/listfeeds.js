@@ -12,7 +12,11 @@ module.exports = class extends Command {
   }
 
   async run({ guild, reply, client, args: { page: pageNum } }) {
-    const docs = await this.getFeeds(client, guild.id);
+    const { success, message, docs } = await this.getFeeds(client, guild.id);
+    if (!success) {
+      await reply(`Please ensure I have permissions to **Manage Webhooks**. If everything seems okay, please visit my support server or wait a few moments.\n<https://discord.gg/pKtCuVv>`, { success: false });
+      return;
+    }
 
     if (!docs.length) {
       await reply('No feeds have been setup for this server.', { success: false });
@@ -66,11 +70,11 @@ module.exports = class extends Command {
     let page = 1;
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const { body: body, success: success } = await client.api.getGuildFeeds(guildID, { page });
-      if (!success) return docs;
+      const { body: body, message, success: success } = await client.api.getGuildFeeds(guildID, { page });
+      if (!success) return { success, message, docs };
       docs.push(...body.feeds);
       page++;
-      if (body.pages >= body.page) return docs;
+      if (body.page >= body.pages) return { success, message, docs };
     }
   }
 
