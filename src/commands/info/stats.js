@@ -25,9 +25,9 @@ module.exports = class extends Command {
     const { body: thisServer, success: otherSuccess } = guild ? await client.api.getGuildFeeds(guild.id) : { success: false, body: null };
 
     if (client.gatewayClient.connected) {
-      const guilds = await client.gatewayClient.request({ t: 'cluster', id: 'all' }, 'this.guilds.size');
-      const users = await client.gatewayClient.request({ t: 'cluster', id: 'all' }, 'this.users.size');
-      const ram = await client.gatewayClient.request({ t: 'cluster', id: 'all' }, 'process.memoryUsage().heapUsed');
+      const guilds = await client.gatewayClient.request({ name: 'cluster', id: 'all' }, 'this.guilds.size');
+      const users = await client.gatewayClient.request({ name: 'cluster', id: 'all' }, 'this.users.size');
+      const ram = await client.gatewayClient.request({ name: 'cluster', id: 'all' }, 'process.memoryUsage().heapUsed');
 
       if (!guilds.length) {
         reply('The gateway encountered an error collecting stats.', { success: false });

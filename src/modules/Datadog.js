@@ -42,7 +42,7 @@ module.exports = class DatadogManager {
    * Update statistics.
    */
   async updateStats() {
-    let guilds = await this.client.gatewayClient.request({ t: 'cluster', id: 'all' }, 'this.guilds.size');
+    let guilds = await this.client.gatewayClient.request({ name: 'cluster', id: 'all' }, 'this.guilds.size');
     let { body: feeds } = await this.client.api.getAllFeeds();
     if (!guilds.length) return;
 

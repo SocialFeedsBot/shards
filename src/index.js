@@ -1,7 +1,7 @@
 /* Constants */
 const config = require('../config');
 const Eris = require('eris');
-const GatewayClient = require('./gateway/GatewayClient');
+const GatewayClient = require('gateway-client');
 const fs = require('fs');
 const path = require('path');
 require('eris-additions')(Eris, { enabled: ['Channel.awaitMessages', 'User.tag', 'Member.tag', 'Member.highestRole', 'Guild.me'] });
@@ -41,7 +41,7 @@ class SocialFeeds extends Eris.Client {
 
     gateway
       .on('debug', (msg) => logger.extension('Gateway').debug(msg))
-      .on('requestSharedGuilds', packet => gateway.sendSharedGuilds(packet, packet.d.guilds.filter(id => this.guilds.get(id))))
+      .on('requestSharedGuilds', packet => gateway.sendSharedGuilds(packet, packet.data.guilds.filter(id => this.guilds.get(id))))
       .on('request', async (id, data) => {
         try {
           let res = await eval(data.input);
@@ -75,13 +75,14 @@ process.on('unhandledRejection', (e) => {
   logger.error('Unhandled exception:', e.stack);
 });
 
-const worker = new GatewayClient(config.gateway);
+const worker = new GatewayClient(config.gateway.use, 'cluster', config.gateway.address, config.gateway.secret);
 
 worker
   .on('error', (err) => logger.extension('Gateway').error(err))
   .on('connect', (ms) => logger.extension('Gateway').info(`Connected in ${ms}ms`))
-  .on('ready', (clusterID, shardStart, shardEnd, shardCount) => {
-    new SocialFeeds(worker, clusterID, shardStart, shardEnd, shardCount).init();
+  .on('restart', () => process.exit(1))
+  .once('ready', ({ id, shard_start, shard_end, shard_count }) => {
+    new SocialFeeds(worker, id, shard_start, shard_end, shard_count).init();
   });
 
 worker.connect();
