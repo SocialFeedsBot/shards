@@ -9,7 +9,7 @@ module.exports = class extends Command {
   }
 
   async run({ reply }) {
-    await reply(`<https://discordapp.com/api/oauth2/authorize?client_id=640989075452723200&scope=bot>`);
+    await reply(`<https://discordapp.com/api/oauth2/authorize?client_id=640989075452723200&scope=bot%20applications.commands>`);
   }
 
 };
