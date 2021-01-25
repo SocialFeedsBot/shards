@@ -7,7 +7,7 @@ module.exports = class extends Command {
     super(...args, {
       description: stripIndents`Adds a new feed for the server.\n
         \`type\` can consist of either rss, reddit, twitch, twitter or youtube.\n
-        \`feed url\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name.\n
+        \`feed\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name.\n
         \`channel\` must be the channel where you want the feed. The channel can always be changed by setting the channel of the webhook the bot creates.
         
         **Flags:**
