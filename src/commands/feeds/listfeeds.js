@@ -40,12 +40,12 @@ module.exports = class extends Command {
       const embed = reply.withEmbed()
         .setColour('orange')
         .setTitle(`Feed List - Page ${page}/${chunks.length}`)
-        .setDescription('Only 10 feeds are shown per channel, to view the full list head to your [dashboard](https://discordfeeds.com/oauth)');
+        .setDescription('**:warning: Only 5 feeds are shown per channel**, to view the full list head to your [dashboard](https://discordfeeds.com/oauth)');
 
       // Populate fields
       chunks[page - 1].forEach((doc) => embed.addField(
         `#${doc[0].channelName} (${doc.length})`,
-        doc.map(f => this.feedType(f)).splice(0, 10).join('\n'),
+        doc.map(f => this.feedType(f)).splice(0, 5).join('\n'),
         true
       ));
 

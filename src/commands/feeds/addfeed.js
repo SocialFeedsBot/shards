@@ -20,7 +20,7 @@ module.exports = class extends Command {
   }
 
   async run({ args, author, channel, guild, reply, client }) {
-    if (!args.channel.permissionsOf(author.id).has('readMessages')) {
+    if (!args.channel || !args.channel.permissionsOf(author.id).has('readMessages')) {
       await reply('You are unable to see this channel.', { success: false });
       return;
     }
