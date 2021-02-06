@@ -6,15 +6,15 @@ module.exports = class extends Command {
     super(...args, {
       description: 'Lists the feeds that have been setup in this server. To setup a feed, run the `addfeed` command.',
       guildOnly: true,
-      aliases: ['list'],
-      args: [{ type: 'int', label: 'page', optional: true }]
+      aliases: ['listfeeds'],
+      args: [{ type: 'channel' }, { type: 'int', label: 'page', optional: true }]
     });
   }
 
-  async run({ guild, reply, client, args: { page: pageNum } }) {
-    const { success, message, docs } = await this.getFeeds(client, guild.id);
+  async run({ guild, reply, client, args: { channel, page: pageNum } }) {
+    const { success, docs } = await this.getFeeds(client, guild.id);
     if (!success) {
-      await reply(`Please ensure I have permissions to **Manage Webhooks**. If everything seems okay, please visit my support server or wait a few moments.\n<https://discord.gg/pKtCuVv>`, { success: false });
+      await reply(`Please ensure I have permissions to **Manage Webhooks**. If everything seems okay, please visit my support server or wait a few moments.\nhttps://discord.gg/pKtCuVv`, { success: false });
       return;
     }
 
@@ -22,32 +22,27 @@ module.exports = class extends Command {
       await reply('No feeds have been setup for this server.', { success: false });
     } else {
       // Put the feeds into an array by channel ID.
-      let feeds = {};
-      docs.forEach((doc) => {
-        if (guild.channels.get(doc.channelID)) {
-          if (!feeds[doc.channelID]) feeds[doc.channelID] = [];
-          feeds[doc.channelID].push({ ...doc, channelName: guild.channels.get(doc.channelID).name });
-        }
+      let feeds = [];
+      docs.filter(doc => doc.channelID === channel.id).forEach((doc) => {
+        feeds.push(doc);
       });
-      feeds = Object.values(feeds);
 
       // Paginate
       let chunks = [];
-      while (feeds.length > 0) chunks.push(feeds.splice(0, 2));
+      while (feeds.length > 0) chunks.push(feeds.splice(0, 5));
       let page = Math.min(Math.max(parseInt(pageNum || 1), 1), chunks.length) || 1;
 
       // Embed
       const embed = reply.withEmbed()
         .setColour('orange')
-        .setTitle(`Feed List - Page ${page}/${chunks.length}`)
-        .setDescription('**:warning: Only 5 feeds are shown per channel**, to view the full list head to your [dashboard](https://discordfeeds.com/oauth)');
+        .setTitle(`Feed list for #${channel.name}`)
+        .setFooter(`Page ${page}/${chunks.length}`)
+        .setDescription('**:information_source: You can now manage your feeds on an online dashboard!** [Click here to go.](https://socialfeeds.app)\n\n');
 
       // Populate fields
-      chunks[page - 1].forEach((doc) => embed.addField(
-        `#${doc[0].channelName} (${doc.length})`,
-        doc.map(f => this.feedType(f)).splice(0, 5).join('\n'),
-        true
-      ));
+      chunks[page - 1].forEach((doc) => {
+        embed.description += `\n${this.feedType(doc)} ${doc.type === 'twitter' ? `[${doc.options.replies ? 'with replies' : 'without replies'}]` : ''}`;
+      });
 
       // Send the embed
       embed.send();
