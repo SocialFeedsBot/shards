@@ -10,8 +10,8 @@ module.exports = (client, message, input) => {
     feed = 'rss';
   } else if (['reddit'].includes(input.toLowerCase())) {
     feed = 'reddit';
-  } else if (['discord', 'discordstatus'].includes(input.toLowerCase())) {
-    feed = 'discordstatus';
+  } else if (['status', 'statuspage'].includes(input.toLowerCase())) {
+    feed = 'statuspage';
   }
 
   if (feed) {

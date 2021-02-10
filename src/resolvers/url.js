@@ -3,6 +3,8 @@ const url = /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169
 module.exports = (client, message, input, _, allArgs) => {
   if (allArgs.type === 'rss') {
     return input;
+  } else if (allArgs.type === 'statuspage') {
+    return new URL(input).origin;
   } else if (url.test(input)) {
     input = input.substring(input.lastIndexOf('/') + 1);
   }
