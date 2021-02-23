@@ -8,13 +8,20 @@ module.exports = class extends Command {
       description: stripIndents`Adds a new feed for the server.\n
         \`type\` can consist of either rss, reddit, twitch, twitter or youtube.\n
         \`feed\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name.\n
-        \`channel\` must be the channel where you want the feed. The channel can always be changed by setting the channel of the webhook the bot creates.
+        \`channel\` must be the channel where you want the feed. The channel can always be changed by setting the channel of the webhook the bot creates
+        \`message\` is the message to be sent along with a new post.
+        \`flags\` is where you can add flags which are listed below.
         
         **Flags:**
-        \`--include-replies\` this option is to include replies in the Twitter feed.`,
+        \`--include-replies\` this option is to include replies in the Twitter feed (default to exclude replies)`,
       guildOnly: true,
       aliases: ['addfeed'],
-      args: [{ type: 'feed', label: 'type' }, { type: 'url' }, { type: 'channel' }, { type: 'text', label: 'flags', optional: true }],
+      args: [{ type: 'feed', label: 'type' },
+        { type: 'url' },
+        { type: 'channel' },
+        { type: 'text', label: 'message', optional: true },
+        { type: 'text', label: 'flags', optional: true }
+      ],
       permissions: ['manageGuild']
     });
   }
@@ -30,6 +37,15 @@ module.exports = class extends Command {
       return;
     }
 
+    if (args.message.includes('--')) {
+      args.flags = args.message + (args.flags || '');
+      args.message = undefined;
+    }
+
+    if (!args.flags.includes('--')) {
+      args.message += args.flags;
+    }
+
     const includeReplies = (args.flags || '').toLowerCase().includes('--include-replies');
     if (args.type === 'twitter') args.url = args.url.toLowerCase();
 
@@ -38,7 +54,7 @@ module.exports = class extends Command {
       type: args.type,
       channelID: args.channel.id,
       nsfw: channel.nsfw,
-      options: { replies: includeReplies }
+      options: { replies: includeReplies, message: args.message }
     });
 
     if (!success) {
