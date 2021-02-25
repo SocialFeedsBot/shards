@@ -29,15 +29,15 @@ module.exports = class extends Command {
 
       // Paginate
       let chunks = [];
-      while (feeds.length > 0) chunks.push(feeds.splice(0, 5));
+      while (feeds.length > 0) chunks.push(feeds.splice(0, 15));
       let page = Math.min(Math.max(parseInt(pageNum || 1), 1), chunks.length) || 1;
 
       // Embed
       const embed = reply.withEmbed()
-        .setColour('orange')
+        .setColour(16753451)
         .setTitle(`Feed list for #${channel.name}`)
-        .setFooter(`Page ${page}/${chunks.length}`)
-        .setDescription('**:information_source: You can now manage your feeds on an online dashboard!** [Click here to go.](https://socialfeeds.app)\n\n');
+        .setFooter(`Total feeds: ${docs.length} (15 max shown)`)
+        .setDescription('You can now manage your feeds on an online [dashboard](https://socialfeeds.app)\n');
 
       // Populate fields
       chunks[page - 1].forEach((doc) => {
