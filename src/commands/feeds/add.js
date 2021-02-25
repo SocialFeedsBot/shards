@@ -37,7 +37,7 @@ module.exports = class extends Command {
       return;
     }
 
-    if (args.message.includes('--')) {
+    if ((args.message || '').includes('--')) {
       args.flags = args.message + (args.flags || '');
       args.message = undefined;
     }
