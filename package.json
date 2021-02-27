@@ -20,6 +20,7 @@
     "moment": "^2.24.0",
     "moment-duration-format": "^2.3.2",
     "mongodb": "^3.6.4",
+    "prom-client": "^13.1.0",
     "superagent": "^5.2.2"
   },
   "devDependencies": {
