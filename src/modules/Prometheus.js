@@ -10,10 +10,10 @@ module.exports = class PrometheusManager {
     if (use) {
       setInterval(() => this.updateStats(), 60 * 1000);
 
-      this.guildCount = new promCli.Gauge({ name: 'guild_count', help: 'amount of guilds' });
-      this.feedCount = new promCli.Gauge({ name: 'feed_count', help: 'amount of feeds' });
-      this.shardDisconnect = new promCli.Counter({ name: 'shard_disconnect', help: 'amount of shard disconnects' });
-      this.shardResume = new promCli.Counter({ name: 'shard_resume', help: 'amount of shard resumes' });
+      this.guildCount = new promCli.Gauge({ name: 'sfbot_guild_count', help: 'amount of guilds' });
+      this.feedCount = new promCli.Gauge({ name: 'sfbot_feed_count', help: 'amount of feeds' });
+      this.shardDisconnect = new promCli.Counter({ name: 'sfbot_shard_disconnect', help: 'amount of shard disconnects' });
+      this.shardResume = new promCli.Counter({ name: 'sfbot_shard_resume', help: 'amount of shard resumes' });
     }
   }
 
