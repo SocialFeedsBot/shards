@@ -1,26 +1,24 @@
 // Prometheus Module
-const promCli = require('prom-client');
+const superagent = require('superagent');
 
 module.exports = class PrometheusManager {
 
-  constructor(client, use) {
+  constructor(client, config) {
     this.client = client;
-    this.use = use;
+    this.use = config.use;
+    this.url = config.url;
 
-    if (use) {
+    if (this.use) {
       setInterval(() => this.updateStats(), 60 * 1000);
-
-      this.guildCount = new promCli.Gauge({ name: 'sfbot_guild_count', help: 'amount of guilds' });
-      this.feedCount = new promCli.Gauge({ name: 'sfbot_feed_count', help: 'amount of feeds' });
-      this.shardDisconnect = new promCli.Counter({ name: 'sfbot_shard_disconnect', help: 'amount of shard disconnects' });
-      this.shardResume = new promCli.Counter({ name: 'sfbot_shard_resume', help: 'amount of shard resumes' });
     }
   }
 
-  increment(stat, val = 1) {
-    if (this.use && this[stat]) {
-      this[stat].inc(val);
+  increment (stat) {
+    if (this.use) {
+      return superagent.post(`${this.url}/counter/${stat}`);
     }
+
+    return null;
   }
 
   /**
@@ -31,8 +29,8 @@ module.exports = class PrometheusManager {
     let { body: feeds } = await this.client.api.getAllFeeds();
     if (!guilds.length) return;
 
-    this.guildCount.set(guilds.reduce((a, b) => a + b));
-    this.feedCount.set(feeds.feedCount);
+    await superagent.post(`${this.url}/gauge/guilds/set/${guilds.reduce((a, b) => a + b)}`);
+    await superagent.post(`${this.url}/gauge/feeds/set/${feeds.feedCount}`);
   }
 
 };
