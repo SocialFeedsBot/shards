@@ -29,8 +29,8 @@ module.exports = class PrometheusManager {
     let { body: feeds } = await this.client.api.getAllFeeds();
     if (!guilds.length) return;
 
-    await superagent.post(`${this.url}/gauge/guilds/set/${guilds.reduce((a, b) => a + b)}`);
-    await superagent.post(`${this.url}/gauge/feeds/set/${feeds.feedCount}`);
+    await superagent.post(`${this.url}/gauge/set/guilds/${guilds.reduce((a, b) => a + b)}`);
+    await superagent.post(`${this.url}/gauge/set/feeds/${feeds.feedCount}`);
   }
 
 };
