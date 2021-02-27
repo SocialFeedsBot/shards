@@ -37,7 +37,7 @@ class SocialFeeds extends Eris.Client {
 
     this.api = new APIModule(config.api);
     this.commands = new CommandModule(this);
-    this.prometheus = new PrometheusModule(this, config.usePrometheus);
+    this.prometheus = new PrometheusModule(this, config.prometheus);
 
     gateway
       .on('debug', (msg) => logger.extension('Gateway').debug(msg))
