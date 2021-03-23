@@ -1,4 +1,4 @@
 module.exports = (client, id) => {
   client.logger.warn(`Shard ${id} resumed.`);
-  client.datadog.increment('shardResume');
+  client.prometheus.increment('shardResume');
 };

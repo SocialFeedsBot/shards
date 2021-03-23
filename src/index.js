@@ -44,7 +44,6 @@ class SocialFeeds extends Eris.Client {
       .on('requestSharedGuilds', packet => gateway.sendSharedGuilds(packet, packet.data.guilds.filter(id => this.guilds.get(id))))
       .on('request', async (id, data) => {
         try {
-          console.log(data.input);
           let res = await eval(data.input);
           gateway.resolve(id, res);
         } catch(err) {
