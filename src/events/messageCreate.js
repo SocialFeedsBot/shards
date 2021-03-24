@@ -1,5 +1,5 @@
 module.exports = async (client, message) => {
-  const prefixRegex = new RegExp(`^(<@!?${client.user.id}>|${client.config.prefix})( *)?`);
+  const prefixRegex = new RegExp(`^(df!|<@!?${client.user.id}>|${client.config.prefix})( *)?`);
   const match = message.content.match(prefixRegex);
   if (!match) return;
   const prefix = match[0];
