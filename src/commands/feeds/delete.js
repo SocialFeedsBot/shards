@@ -10,7 +10,7 @@ module.exports = class extends Command {
         \`feed url\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name..
         \`channel\` must be the channel where you want to remove the feed from.`,
       guildOnly: true,
-      aliases: ['delfeed', 'del', 'rm'],
+      aliases: ['delfeed', 'del', 'remove'],
       args: [{ type: 'feed', label: 'type' }, { type: 'url' }, { type: 'channel' }],
       permissions: ['manageGuild']
     });
