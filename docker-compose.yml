@@ -24,6 +24,8 @@ services:
       - .:/usr/src/
     depends_on:
       - gateway
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   api:
     build: ../api
@@ -34,6 +36,8 @@ services:
       - gateway
     ports:
       - 8081:4011
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   feeds:
     build: ../feed-handler
@@ -46,6 +50,8 @@ services:
     ports:
       - 4014:4014
       - 4015:4015
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   interactions:
     build: ../interactions
