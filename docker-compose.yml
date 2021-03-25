@@ -7,7 +7,7 @@ services:
     volumes:
       - ../metrics/:/usr/src/
     ports:
-      - 4050
+      - 4050:4050
 
   gateway:
     build: ../gateway
