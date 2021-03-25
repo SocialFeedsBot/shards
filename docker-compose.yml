@@ -43,6 +43,9 @@ services:
     depends_on:
       - gateway
       - api
+    ports:
+      - 4014:4014
+      - 4015:4015
 
   interactions:
     build: ../interactions
