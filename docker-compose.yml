@@ -54,3 +54,5 @@ services:
       - ../interactions/:/usr/src/
     depends_on:
       - gateway
+    ports:
+      - 4017:4017
