@@ -5,7 +5,7 @@ module.exports = class extends Command {
 
   constructor(...args) {
     super(...args, {
-      description: stripIndents`Removes a feed from the server.\n
+      description: stripIndents`**Manage feeds with our new [web dashboard!](https://socialfeeds.app)**\nRemoves a feed from the server.\n
         \`type\` can consist of either rss, twitch, twitter or youtube.\n
         \`feed url\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name..
         \`channel\` must be the channel where you want to remove the feed from.`,

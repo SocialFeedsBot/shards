@@ -5,11 +5,11 @@ module.exports = class extends Command {
 
   constructor(...args) {
     super(...args, {
-      description: stripIndents`Adds a new feed for the server.\n
+      description: stripIndents`**Manage feeds with our new [web dashboard!](https://socialfeeds.app)**\nAdds a new feed for the server.\n
         \`type\` can consist of either rss, reddit, twitch, twitter or youtube.\n
         \`feed\` must be the RSS URL or the Twitter/Twitch/Reddit/YouTube channel name.\n
-        \`channel\` must be the channel where you want the feed. The channel can always be changed by setting the channel of the webhook the bot creates
-        \`message\` is the message to be sent along with a new post.
+        \`channel\` must be the channel where you want the feed. The channel can always be changed by setting the channel of the webhook the bot creates\n
+        \`message\` is the message to be sent along with a new post.\n
         \`flags\` is where you can add flags which are listed below.
         
         **Flags:**

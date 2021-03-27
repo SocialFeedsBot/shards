@@ -4,7 +4,7 @@ module.exports = class extends Command {
 
   constructor(...args) {
     super(...args, {
-      description: 'Lists the feeds that have been setup in this server. To setup a feed, run the `addfeed` command.',
+      description: '**Manage feeds with our new [web dashboard!](https://socialfeeds.app)**\nLists the feeds that have been setup in this server. To setup a feed, run the `addfeed` command.',
       guildOnly: true,
       aliases: ['listfeeds'],
       args: [{ type: 'channel' }, { type: 'int', label: 'page', optional: true }]
