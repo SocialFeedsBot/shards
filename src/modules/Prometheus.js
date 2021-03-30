@@ -30,7 +30,7 @@ module.exports = class PrometheusManager {
     if (!guilds.length) return;
     guilds = guilds.reduce((acc, val) => acc += val.guilds, 0);
 
-    await superagent.post(`${this.url}/gauge/set/guilds/${guilds.reduce((a, b) => a + b)}`);
+    await superagent.post(`${this.url}/gauge/set/guilds/${guilds}`);
     await superagent.post(`${this.url}/gauge/set/feeds/${feeds.feedCount}`);
   }
 
