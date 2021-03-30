@@ -4,7 +4,7 @@ module.exports = class extends Command {
 
   constructor(...args) {
     super(...args, {
-      args: [{ type: 'text', label: 'msg', optional: false }], hidden: true
+      hidden: true
     });
   }
 
