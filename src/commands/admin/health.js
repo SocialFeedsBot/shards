@@ -11,18 +11,9 @@ module.exports = class extends Command {
   }
 
   async run({ client, reply }) {
-    const api = await client.gatewayClient.request(
-      { name: 'api' },
-      '({ uptime: process.uptime() * 1000, memory: process.memoryUsage().heapUsed })'
-    );
-    const feeds = await client.gatewayClient.request(
-      { name: 'feeds' },
-      '({ uptime: process.uptime() * 1000, memory: process.memoryUsage().heapUsed })'
-    );
-    const clusters = await client.gatewayClient.request(
-      { name: 'cluster', id: 'all' },
-      '({ id: this.clusterID, uptime: process.uptime() * 1000, memory: process.memoryUsage().heapUsed })'
-    );
+    const api = await client.gatewayClient.action('stats', { name: 'api' });
+    const feeds = await client.gatewayClient.action('stats', { name: 'feeds' });
+    const clusters = await client.gatewayClient.action('stats', { name: 'cluster' });
 
     const embed = reply.withEmbed().setColour('orange').setTitle('Service Health');
     let downServices = [];
@@ -49,7 +40,7 @@ module.exports = class extends Command {
 
     clusters.forEach(cluster => {
       embed.addField(
-        `cluster-${cluster.id}`,
+        `cluster-${cluster.clusterID}`,
         `Uptime: ${moment.duration(cluster.uptime).format('D[d] H[ h] m[ m] s[ s]')}\nMemory: ${this.memory(cluster.memory)}`,
         true
       );

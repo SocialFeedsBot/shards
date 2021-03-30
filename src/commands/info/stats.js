@@ -25,19 +25,16 @@ module.exports = class extends Command {
     const { body: thisServer, success: otherSuccess } = guild ? await client.api.getGuildFeeds(guild.id) : { success: false, body: null };
 
     if (client.gatewayClient.connected) {
-      const guilds = await client.gatewayClient.request({ name: 'cluster', id: 'all' }, 'this.guilds.size');
-      const users = await client.gatewayClient.request({ name: 'cluster', id: 'all' }, 'this.users.size');
-      const ram = await client.gatewayClient.request({ name: 'cluster', id: 'all' }, 'process.memoryUsage().heapUsed');
+      const results = await client.gatewayClient.action('stats', { name: 'cluster' });
 
-      if (!guilds.length) {
+      if (!results.length) {
         reply('The gateway encountered an error collecting stats.', { success: false });
         return;
       }
 
-      stats.guilds = guilds.reduce((a, b) => a + b);
-      stats.users = users.reduce((a, b) => a + b);
-      stats.ram = ram.reduce((a, b) => a + b);
-      stats.clusterCount = guilds.length;
+      stats.guilds = results.reduce((acc, val) => acc += val.guilds, 0);
+      stats.users = results.reduce((acc, val) => acc += val.users, 0);
+      stats.ram = results.reduce((acc, val) => acc += val.memory, 0);
     }
 
     reply.withEmbed()

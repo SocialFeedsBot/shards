@@ -25,9 +25,10 @@ module.exports = class PrometheusManager {
    * Update statistics.
    */
   async updateStats() {
-    let guilds = await this.client.gatewayClient.request({ name: 'cluster', id: 'all' }, 'this.guilds.size');
+    let guilds = await this.client.gatewayClient.action('stats', { name: 'cluster' });
     let { body: feeds } = await this.client.api.getAllFeeds();
     if (!guilds.length) return;
+    guilds = guilds.reduce((acc, val) => acc += val.guilds, 0);
 
     await superagent.post(`${this.url}/gauge/set/guilds/${guilds.reduce((a, b) => a + b)}`);
     await superagent.post(`${this.url}/gauge/set/feeds/${feeds.feedCount}`);

@@ -10,7 +10,7 @@ module.exports = class extends Command {
 
   async run({ reply, author, client, args: { target, id } }) {
     await reply(`Restarting services with type **${target}** (ids: \`${id ? id.split(',').join('` `') : 'N/A'}\`)`);
-    client.gatewayClient.restart({ name: target, id: id ? (id === 'all' ? id : id.split(',')) : undefined, restarter: author.id, panel: false });
+    client.gatewayClient.action('restart', { name: target, id: id ? (id === 'all' ? id : id.split(',')) : undefined }, { restarter: author.id, panel: false });
   }
 
 };

@@ -24,6 +24,10 @@ module.exports = class APIModule {
     return this.request('delete', 'feeds', { ...data, guildID });
   }
 
+  setStatus(body) {
+    return this.request('patch', 'status/messages', body);
+  }
+
   request(method, path, data, query) {
     return new Promise(resolve => {
       superagent[method](`${this._apiURL}/${path}`)
