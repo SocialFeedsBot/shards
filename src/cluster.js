@@ -53,7 +53,19 @@ class SocialFeeds extends Eris.Client {
 
     gateway.on('debug', (msg) => logger.extension('Gateway').debug(msg))
       .on('requestSharedGuilds', packet => gateway.sendSharedGuilds(packet, packet.data.filter(id => this.guilds.get(id))))
-      .on('getGuild', ({ guildID }, cb) => cb(this.guilds.get(guildID).toJSON()));
+      .on('getGuild', ({ guildID }, cb) => cb(this.guilds.get(guildID).toJSON()))
+      .on('getCommands', (_, cb) => {
+        cb(this.commands.map(cmd => ({
+          name: cmd.name,
+          aliases: cmd.aliases,
+          description: cmd.description,
+          permissions: cmd.permisisons,
+          args: cmd.args,
+          hidden: cmd.hidden,
+          botPermissions: cmd.botPermissions,
+          guildOnly: cmd.guildOnly
+        })));
+      });
   }
 
   async init() {
