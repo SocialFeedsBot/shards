@@ -15,7 +15,7 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - .docker/redis-volume:/data/
+      - /var/lib/redis:/data/
 
   metrics:
     build: ../metrics
