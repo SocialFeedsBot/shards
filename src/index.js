@@ -13,7 +13,7 @@ class ClusterManager {
 
   async run() {
     const { body: gw } = await superagent.get('https://discord.com/api/v8/gateway/bot')
-      .set('Authorization', `Bot ${config.token}`);
+      .set('Authorization', config.token);
     logger.debug(`Recommended shards: ${gw.shards} | Total sessions: ${gw.session_start_limit.total} | Remaining: ${gw.session_start_limit.remaining}`);
 
     const shardsPerCluster = Math.ceil(config.shards / config.clusters);
