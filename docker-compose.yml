@@ -1,63 +1,69 @@
 version: '3'
 
 services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017-27019:27017-27019
+    volumes:
+      - .docker/mongo-volume:/data/db
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - .docker/redis-volume:/data/
+
   metrics:
     build: ../metrics
     restart: always
-    volumes:
-      - ../metrics/:/usr/src/
+
     ports:
       - 4050:4050
 
   gateway:
     build: ../gateway
     restart: always
-    volumes:
-      - ../gateway/:/usr/src/
+
     ports:
-      - 8080:4200
+      - 4200:4200
 
   bot:
     build: .
     restart: always
-    volumes:
-      - .:/usr/src/
+
     depends_on:
       - gateway
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   api:
     build: ../api
     restart: always
-    volumes:
-      - ../api/:/usr/src/
+
     depends_on:
+      - mongo
       - gateway
     ports:
-      - 8081:4011
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 4011:4011
 
   feeds:
     build: ../feed-handler
     restart: always
-    volumes:
-      - ../feed-handler/:/usr/src/
+
     depends_on:
       - gateway
       - api
+      - redis
     ports:
       - 4014:4014
       - 4015:4015
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   interactions:
     build: ../interactions
     restart: always
-    volumes:
-      - ../interactions/:/usr/src/
+
     depends_on:
       - gateway
     ports:

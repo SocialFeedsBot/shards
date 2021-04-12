@@ -1,7 +1,7 @@
 /* Constants */
 const config = require('../config');
 const Eris = require('eris');
-const GatewayClient = require('gateway-client');
+const GatewayClient = require('./gateway/');
 const fs = require('fs');
 const path = require('path');
 require('eris-additions')(Eris, { enabled: ['Channel.awaitMessages', 'User.tag', 'Member.tag', 'Member.highestRole', 'Guild.me'] });
