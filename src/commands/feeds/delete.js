@@ -23,7 +23,7 @@ module.exports = class extends Command {
     }
 
     const webhook = (await args.channel.getWebhooks()).find(hook => hook.user.id === client.user.id);
-    const { success, message } = await client.api.deleteFeed(guild.id, {
+    const { success, message, body } = await client.api.deleteFeed(guild.id, {
       url: args.url,
       type: args.type,
       webhookID: webhook.id
@@ -34,7 +34,26 @@ module.exports = class extends Command {
       return;
     }
 
-    await reply(`Feed deleted, it will no longer be posted in ${args.channel.mention}.`, { success: true });
+    if (body.display) {
+      await reply.withEmbed(`Successfully removed feed from \`#${args.channel.name}\`!`, { success: true })
+        .setAuthor(body.display.title, body.display.icon)
+        .send();
+    } else {
+      await reply.withEmbed(`Successfully removed feed from \`#${args.channel.name}\`!`, { success: true })
+        .setTitle(`${this.humanise(body.type)}: ${body.url}`)
+        .send();
+    }
+  }
+
+  humanise(key) {
+    return {
+      reddit: 'Reddit',
+      rss: 'RSS',
+      twitter: 'Twitter',
+      twitch: 'Twitch',
+      youtube: 'YouTube',
+      statuspage: 'Status Page'
+    }[key];
   }
 
 };

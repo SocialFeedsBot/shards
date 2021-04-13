@@ -50,12 +50,13 @@ module.exports = class extends Command {
   }
 
   feedType(feed) {
+    let display = feed.display ? feed.display.title : feed.url;
     return {
-      youtube: `<:youtube:644633161464020993> [${feed.url}](https://youtube.com/channel/${feed.url})`,
-      twitch: `<:twitch:644633161401368577> [${feed.url}](https://twitch.tv/${feed.url})`,
-      twitter: `<:twitter:644633161212624946> [${feed.url}](https://twitter.com/${feed.url})`,
-      rss: `<:rss:644633161933914122> [${feed.url}](${feed.url})`,
-      reddit: `<:reddit:648124175378284544> [${feed.url}](https://reddit.com/r/${feed.url})`,
+      youtube: `<:youtube:644633161464020993> [${display}](https://youtube.com/channel/${feed.url})`,
+      twitch: `<:twitch:644633161401368577> [${display}](https://twitch.tv/${feed.url})`,
+      twitter: `<:twitter:644633161212624946> [${display}](https://twitter.com/${feed.url})`,
+      rss: `<:rss:644633161933914122> [${display}](${feed.url})`,
+      reddit: `<:reddit:648124175378284544> [${display}](https://reddit.com/r/${feed.url})`,
       statuspage: `<:statuspage:809109311271600138> [Status Page: ${feed.url}](${feed.url})`
     }[feed.type];
   }

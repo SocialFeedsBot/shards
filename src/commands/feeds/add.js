@@ -49,7 +49,7 @@ module.exports = class extends Command {
     const includeReplies = (args.flags || '').toLowerCase().includes('--include-replies');
     if (args.type === 'twitter') args.url = args.url.toLowerCase();
 
-    const { success, message } = await client.api.createNewFeed(guild.id, {
+    const { success, message, body } = await client.api.createNewFeed(guild.id, {
       url: args.url,
       type: args.type,
       channelID: args.channel.id,
@@ -62,7 +62,9 @@ module.exports = class extends Command {
       return;
     }
 
-    await reply(`Feed created, it will be posted in ${args.channel.mention}.`, { success: true });
+    await reply.withEmbed(`Successfully added feed to \`#${args.channel.name}\`!`, { success: true })
+      .setAuthor(body.feedData.title, body.feedData.icon)
+      .send();
   }
 
 };
