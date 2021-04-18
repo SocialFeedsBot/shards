@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "common-tags": "^1.8.0",
-    "datadog-metrics": "^0.8.1",
+    "datadog-metrics": "^0.9.3",
     "eris": "^0.15.0",
     "eris-additions": "^1.4.1",
     "ioredis": "^4.26.0",
