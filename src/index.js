@@ -40,7 +40,7 @@ class ClusterManager {
       let newWorker = master.fork({ clusterID: worker.id, firstShardID, lastShardID, totalShards: config.shards });
       newWorker.id = worker.id;
 
-      this.clusters.set(newWorker.id, { worker: newWorker, firstShardID, lastShardID });
+      this.clusters.set(worker.id, { worker: newWorker, firstShardID, lastShardID });
       this.handleCluster({ worker: newWorker, firstShardID, lastShardID });
     });
   }
