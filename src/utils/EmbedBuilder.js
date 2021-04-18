@@ -4,10 +4,10 @@ class EmbedBuilder {
 
   /**
    * Create an embed builder instance.
-   * @param {Channel?} channel The discord channel
+   * @param {Message?} message The Discord message
    */
-  constructor(channel) {
-    this.channel = channel;
+  constructor(message) {
+    this.message = message;
 
     this.fields = [];
   }
@@ -123,10 +123,10 @@ class EmbedBuilder {
    * @returns {null|Promise<Message>}
    */
   send() {
-    if (!this.channel) return null;
+    if (!this.message) return null;
 
-    const embed = { ...this, channel: undefined };
-    return this.channel.createMessage({ embed });
+    const embed = { ...this, message: undefined };
+    return this.message.channel.createMessage({ embed, messageReferenceID: this.message.id });
   }
 
 }

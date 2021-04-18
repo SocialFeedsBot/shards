@@ -19,11 +19,11 @@ module.exports = (message) => {
 
     if (options.emoji) final = `${emotes[options.emoji]} ${content}`;
 
-    return message.channel.createMessage(final);
+    return message.channel.createMessage({ content: final, messageReferenceID: message.id });
   };
 
   reply.withEmbed = (description, options = { success: null, emoji: null }) => {
-    const embed = new EmbedBuilder(message.channel);
+    const embed = new EmbedBuilder(message);
 
     switch (options.success) {
       case true: {
