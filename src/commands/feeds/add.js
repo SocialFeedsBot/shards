@@ -13,7 +13,8 @@ module.exports = class extends Command {
         \`flags\` is where you can add flags which are listed below.
         
         **Flags:**
-        \`--include-replies\` this option is to include replies in the Twitter feed (default to exclude replies)`,
+        \`--include-replies\` this option is to include replies in the Twitter feed (default to exclude replies)
+        \`--exclude-desc\` includes a brief description of new RSS articles (default to include)`,
       guildOnly: true,
       aliases: ['addfeed', 'create'],
       args: [{ type: 'feed', label: 'type' },
@@ -47,6 +48,7 @@ module.exports = class extends Command {
     }
 
     const includeReplies = (args.flags || '').toLowerCase().includes('--include-replies');
+    const excludeDesc = (args.flags || '').toLowerCase().includes('--exclude-desc');
     if (args.type === 'twitter') args.url = args.url.toLowerCase();
 
     const { success, message, body } = await client.api.createNewFeed(guild.id, {
@@ -54,7 +56,7 @@ module.exports = class extends Command {
       type: args.type,
       channelID: args.channel.id,
       nsfw: channel.nsfw,
-      options: { replies: includeReplies, message: args.message }
+      options: { replies: includeReplies, message: args.message, excludeDesc: excludeDesc }
     });
 
     if (!success) {
