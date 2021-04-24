@@ -159,6 +159,7 @@ class GatewayClient extends EventEmitter {
       case OPCodes.HEARTBEAT_ACK: {
         this.latency = Date.now() - this.lastSentHeartbeat;
         this.emit('latency', this.latency);
+        clearTimeout(this.heartbeatAckTimeout);
         break;
       }
 
@@ -227,6 +228,11 @@ class GatewayClient extends EventEmitter {
    * Send a heartbeat.
    */
   heartbeat () {
+    this.heartbeatAckTimeout = setTimeout(() => {
+      this.emit('error', 'Gateway not acknowledged previous heartbeat, reconnecting.');
+      this.ws.close();
+      this.connect();
+    }, 10 * 1000);
     this.lastSentHeartbeat = Date.now();
     this.send(OPCodes.HEARTBEAT);
   }
