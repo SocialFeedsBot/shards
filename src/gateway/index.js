@@ -230,7 +230,7 @@ class GatewayClient extends EventEmitter {
   heartbeat () {
     this.heartbeatAckTimeout = setTimeout(() => {
       this.emit('error', 'Gateway not acknowledged previous heartbeat, reconnecting.');
-      this.ws.close();
+      this.ws.close(4000, 'Gateway not ackknowledged previous heartbeat.');
       this.connect();
     }, 10 * 1000);
     this.lastSentHeartbeat = Date.now();
