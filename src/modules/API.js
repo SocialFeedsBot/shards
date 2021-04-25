@@ -43,7 +43,6 @@ module.exports = class APIModule {
           } else if (err.response) {
             err.message = err.response.body.error;
           }
-          console.log(err);
           resolve({ success: false, message: err.message });
         });
     });
