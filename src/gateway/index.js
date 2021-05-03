@@ -124,7 +124,8 @@ class GatewayClient extends EventEmitter {
             case 'stats': {
               let stats = {
                 uptime: process.uptime() * 1000,
-                memory: process.memoryUsage().heapUsed
+                memory: process.memoryUsage().heapUsed,
+                id: this.id
               };
 
               if (this.getExtraStats) {
