@@ -4,3 +4,4 @@ types
 dist
 .docker
 worker
+.env
