@@ -6,6 +6,7 @@ import (
 	"syscall"
 
 	"github.com/SocialFeedsBot/worker/commands"
+	"github.com/SocialFeedsBot/worker/gateway"
 	"github.com/SocialFeedsBot/worker/internal/logger"
 	"github.com/SocialFeedsBot/worker/internal/shardmanager"
 	env "github.com/joho/godotenv"
@@ -22,6 +23,14 @@ func main() {
 		logrus.Error(e)
 		return
 	}
+
+	// Connect to the gateway
+	gateway := gateway.Gateway{
+		Address: os.Getenv("WEBSOCKET"),
+		Secret:  os.Getenv("SECRET"),
+	}
+
+	go gateway.CreateSession()
 
 	// Create shard manager
 	manager := shardmanager.New("Bot " + os.Getenv("TOKEN"))
