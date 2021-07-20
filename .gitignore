@@ -3,3 +3,4 @@ config.json
 types
 dist
 .docker
+worker
