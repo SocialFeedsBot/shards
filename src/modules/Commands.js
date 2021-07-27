@@ -30,6 +30,11 @@ module.exports = class CommandsModule extends Collection {
     if (args === false) return;
 
     try {
+      await message.reply([
+        ':warning: **Commands starting with the `sf!` prefix will no longer work soon.',
+        'Discord has released slash commands which are a lot more easier to use and more recommended.',
+        'Try using a slash command by typing `/` and selecting the SocialFeeds logo to see commands.'
+      ].join('\n'));
       await command.run({
         message: message,
         reply: message.reply,
