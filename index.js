@@ -1,4 +1,4 @@
-const config = require('../config.json');
+const config = require('./config.json');
 const Logger = require('./logger/');
 const GatewayClient = require('./gateway/');
 const Eris = require('eris');
@@ -35,5 +35,10 @@ worker.getExtraStats = () => ({
     latency: s.latency
   }))
 });
+
+client.on('ready', () => logger.info('Ready'))
+  .on('shardReady', (id) => logger.extension(`S${id}`).info('Ready'))
+  .on('shardResume', (id) => logger.extension(`S${id}`).warn('Resumed'))
+  .on('shardDisconnect', (err, id) => logger.extension(`S${id}`).error(`Disconnected: ${err || 'no error'}`));
 
 worker.connect();
