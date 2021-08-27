@@ -36,8 +36,10 @@ worker.getExtraStats = () => ({
   }))
 });
 
-client.on('ready', () => logger.info('Ready'))
-  .on('shardReady', (id) => logger.extension(`S${id}`).info('Ready'))
+client.on('ready', () => {
+  logger.info('Ready');
+  worker.sendReady();
+}).on('shardReady', (id) => logger.extension(`S${id}`).info('Ready'))
   .on('shardResume', (id) => logger.extension(`S${id}`).warn('Resumed'))
   .on('shardDisconnect', (err, id) => logger.extension(`S${id}`).error(`Disconnected: ${err || 'no error'}`));
 
