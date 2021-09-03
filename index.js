@@ -1,10 +1,11 @@
 const config = require('./config.json');
 const Logger = require('./logger/');
+const superagent = require('superagent');
 const GatewayClient = require('./gateway/');
 const Eris = require('eris');
 
 const logger = new Logger('Shards');
-const client = new Eris.Client(config.token);
+const client = new Eris.Client(config.token, { autoreconnect: true });
 
 process.on('unhandledRejection', (e) => {
   logger.error('Unhandled rejection:', e.stack);
@@ -42,5 +43,12 @@ client.on('ready', () => {
 }).on('shardReady', (id) => logger.extension(`S${id}`).info('Ready'))
   .on('shardResume', (id) => logger.extension(`S${id}`).warn('Resumed'))
   .on('shardDisconnect', (err, id) => logger.extension(`S${id}`).error(`Disconnected: ${err || 'no error'}`));
+
+
+if (config.prometheus && config.prometheus.use) {
+  setInterval(async () => {
+    await superagent.post(`${config.prometheus.url}/gauge/set/guilds/${client.guilds.size}`);
+  }, 60 * 1000);
+}
 
 worker.connect();
