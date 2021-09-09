@@ -42,8 +42,8 @@ client.on('ready', () => {
   worker.sendReady();
 }).on('shardReady', (id) => logger.extension(`S${id}`).info('Ready'))
   .on('shardResume', (id) => logger.extension(`S${id}`).warn('Resumed'))
-  .on('shardDisconnect', (err, id) => logger.extension(`S${id}`).error(`Disconnected: ${err || 'no error'}`));
-
+  .on('shardDisconnect', (err, id) => logger.extension(`S${id}`).error(`Disconnected: ${err || 'no error'}`))
+  .on('error', (err) => logger.error(err));
 
 if (config.prometheus && config.prometheus.use) {
   setInterval(async () => {
