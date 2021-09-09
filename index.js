@@ -39,6 +39,7 @@ worker.getExtraStats = () => ({
 
 client.on('ready', () => {
   logger.info('Ready');
+  client.editStatus({ name: 'socialfeeds.app' });
   worker.sendReady();
 }).on('shardReady', (id) => logger.extension(`S${id}`).info('Ready'))
   .on('shardResume', (id) => logger.extension(`S${id}`).warn('Resumed'))
