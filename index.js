@@ -49,6 +49,17 @@ client.on('ready', () => {
 if (config.prometheus && config.prometheus.use) {
   setInterval(async () => {
     await superagent.post(`${config.prometheus.url}/gauge/set/guilds/${client.guilds.size}`);
+    await superagent.post(`https://top.gg/api/bots/${client.user.id}/stats`)
+      .set('Authorization', config.stats.topgg)
+      .send({
+        server_count: client.guilds.size
+      }).catch((e) => logger.error(`Unable to post stats to top.gg: ${e}`));
+
+    await superagent.post(`https://discord.bots.gg/api/v1/bots/${client.user.id}/stats`)
+      .set('Authorization', config.stats.botsgg)
+      .send({
+        guildCount: client.guilds.size
+      }).catch((e) => logger.error(`Unable to post stats to discord.bots.gg: ${e}`));
   }, 60 * 1000);
 }
 
