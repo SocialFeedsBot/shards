@@ -61,8 +61,8 @@ if (config.prometheus && config.prometheus.use) {
         guildCount: client.guilds.size
       }).catch((e) => logger.error(`Unable to post stats to discord.bots.gg: ${e}`));
 
-    await superagent.post(`https://discordbotlist.com//api/v1/bots/${client.user.id}/stats`)
-      .set('Authorization', config.stats.botsgg)
+    await superagent.post(`https://discordbotlist.com/api/v1/bots/${client.user.id}/stats`)
+      .set('Authorization', config.stats.dbl)
       .send({
         guilds: client.guilds.size
       }).catch((e) => logger.error(`Unable to post stats to discord.bots.gg: ${e}`));
