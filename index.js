@@ -5,7 +5,13 @@ const GatewayClient = require('./gateway/');
 const Eris = require('eris');
 
 const logger = new Logger('Shards');
-const client = new Eris.Client(config.token, { autoreconnect: true, maxShards: 'auto' });
+const client = new Eris.Client(config.token, {
+  autoreconnect: true,
+  maxShards: 'auto',
+  getAllUsers: false,
+  messageLimit: 0,
+  largeThreshold: 0
+});
 
 process.on('unhandledRejection', (e) => {
   logger.error('Unhandled rejection:', e.stack);
