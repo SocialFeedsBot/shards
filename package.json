@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "eris": "^0.15.1",
-    "superagent": "^6.1.0",
+    "superagent": "^7.0.2",
     "ws": "^7.5.3"
   },
   "devDependencies": {
