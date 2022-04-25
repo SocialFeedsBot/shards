@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/SocialFeedsBot/shards/internal/shardmanager"
 	"nhooyr.io/websocket"
 )
 
@@ -23,6 +24,7 @@ type Session struct {
 	HeartbeatInterval time.Duration
 	Ping              time.Duration
 	listening         chan bool
+	ShardManager      *shardmanager.Manager
 }
 
 type HeartbeatTimer struct {

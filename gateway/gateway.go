@@ -3,6 +3,8 @@ package gateway
 
 import (
 	"encoding/json"
+
+	"github.com/SocialFeedsBot/shards/internal/shardmanager"
 )
 
 // Gateway credentials
@@ -27,9 +29,11 @@ const (
 	OPCodeHeartbeatAck OPCode = 5
 	OPCodeAction       OPCode = 6
 
-	ActionResolve        Action = "resolveAction"
-	ActionRequestStats   Action = "stats"
-	ActionRequestRestart Action = "restart"
+	ActionResolve             Action = "resolveAction"
+	ActionRequestStats        Action = "stats"
+	ActionRequestServerInfo   Action = "getGuild"
+	ActionRequestSharedGuilds Action = "requestSharedGuilds"
+	ActionRequestRestart      Action = "restart"
 )
 
 // OPCodeTypes is used to help associate each OPCode when converted to a string
@@ -70,10 +74,14 @@ type Identify struct {
 	ID      string `json:"id,omitempty"`
 }
 
-// CreateSession creates a new session and starts the initial websocket connection to the gateway
-func (gw *Gateway) CreateSession() *Session {
+// CreateSessionWithShardManager creates a new session and starts the initial websocket connection to the gateway
+func (gw *Gateway) CreateSessionWithShardManager(shardManager *shardmanager.Manager) *Session {
 	// Create a new session
-	session := Session{URL: gw.Address, Secret: gw.Secret}
+	session := Session{
+		URL:          gw.Address,
+		Secret:       gw.Secret,
+		ShardManager: shardManager,
+	}
 	session.Connect()
 
 	return &session

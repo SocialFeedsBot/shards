@@ -28,9 +28,6 @@ type Manager struct {
 	// If set logs connection status events to this channel
 	LogChannel string
 
-	// If set keeps an updated satus message in this channel
-	StatusMessageChannel string
-
 	// The function that provides the guild counts per shard, used fro the updated status message
 	// Should return a slice of guild counts, with the index being the shard number
 	GuildCountsFunc func() []int

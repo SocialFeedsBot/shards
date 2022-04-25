@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/SocialFeedsBot/worker/health"
+	"github.com/SocialFeedsBot/shards/health"
 	"github.com/sirupsen/logrus"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
@@ -189,6 +189,10 @@ func (s *Session) deploy(packet Packet) {
 			switch packet.Type {
 			case ActionRequestStats:
 				go s.SendStats(packet)
+			case ActionRequestServerInfo:
+				go s.GetServerInfo(packet)
+			case ActionRequestSharedGuilds:
+				go s.GetSharedGuilds(packet)
 			case ActionRequestRestart:
 				s.reconnect()
 			}
@@ -204,7 +208,7 @@ func (s *Session) deploy(packet Packet) {
 func (s *Session) identify(op OPCode) {
 	s.Lock()
 	data, err := json.Marshal(Identify{
-		Service: "cluster",
+		Service: "shards",
 		Secret:  s.Secret,
 		ID:      s.ID,
 	})
@@ -309,12 +313,88 @@ func (s *Session) SendStats(packet Packet) {
 
 	stats.Memory = mem
 
+	stats.AddShardStatuses(s.ShardManager)
+
 	response, err := json.Marshal(stats)
 	if err != nil {
 		logrus.Errorln(err)
 		return
 	}
 
+	s.send(Packet{
+		OPCode: OPCodeAction,
+		Type:   ActionResolve,
+		Data:   response,
+		ID:     packet.ID,
+	})
+}
+
+func (s *Session) GetServerInfo(packet Packet) {
+	logrus.Traceln("Getting server info")
+
+	// Unmarshall the data
+	var data map[string]string
+	err := json.Unmarshal(packet.Data, &data)
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+
+	// packet is what you send to the gateway to get the server info, might have server ID etc.
+	session := s.ShardManager.SessionForGuildS(data["guildID"])
+	channels, _ := session.GuildChannels(data["guildID"])
+
+	// Marshal your JSON response
+	response, err := json.Marshal(channels)
+	if err != nil {
+		logrus.Errorln(err)
+		return
+	}
+
+	// Return response
+	s.send(Packet{
+		OPCode: OPCodeAction,
+		Type:   ActionResolve,
+		Data:   response,
+		ID:     packet.ID,
+	})
+}
+
+func (s *Session) GetSharedGuilds(packet Packet) {
+	logrus.Traceln("Getting shared guilds")
+
+	// Unmarshall the data
+	var data []string
+	err := json.Unmarshal(packet.Data, &data)
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+
+	// packet is what you send to the gateway to get the server info, might have server ID etc.
+
+	guildIDsPresent := []string{}
+
+	for _, session := range s.ShardManager.Sessions {
+		// a.State.Guilds contains a slice of all guilds
+		for _, guild := range session.State.Guilds {
+			// see if the guild ID is present
+			for _, id := range data {
+				if id == guild.ID {
+					guildIDsPresent = append(guildIDsPresent, guild.ID)
+				}
+			}
+		}
+	}
+
+	// Marshal your JSON response
+	response, err := json.Marshal(guildIDsPresent)
+	if err != nil {
+		logrus.Errorln(err)
+		return
+	}
+
+	// Return response
 	s.send(Packet{
 		OPCode: OPCodeAction,
 		Type:   ActionResolve,

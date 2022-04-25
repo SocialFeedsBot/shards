@@ -1,4 +1,4 @@
-module github.com/SocialFeedsBot/worker
+module github.com/SocialFeedsBot/shards
 
 go 1.16
 

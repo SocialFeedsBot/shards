@@ -7,15 +7,19 @@ import (
 	"os"
 	"runtime"
 	"time"
+
+	"github.com/SocialFeedsBot/shards/internal/shardmanager"
 )
 
 var StartTime = time.Now()
 
 // Health is the structure the gateway expects when requesting data about the process's usage
 type Health struct {
-	Uptime time.Duration `json:"uptime"` // Milliseconds
-	Memory uint64        `json:"memory"`
-	ID     string        `json:"id"`
+	Uptime time.Duration               `json:"uptime"` // Milliseconds
+	Memory uint64                      `json:"memory"` // This won't work on my laptop :D
+	ID     string                      `json:"id"`
+	Guilds int                         `json:"guilds"`
+	Shards []*shardmanager.ShardStatus `json:"shards"`
 }
 
 func ByteCountSI(b uint64) string {
@@ -64,4 +68,11 @@ func GetMemory() (uint64, error) {
 // GetUptime returns process uptime in milliseconds
 func GetUptime() time.Duration {
 	return time.Since(StartTime) / time.Millisecond
+}
+
+// GetShardsStatus updates the current health struct with shard data.
+func (health *Health) AddShardStatuses(manager *shardmanager.Manager) {
+	status := manager.GetFullStatus()
+	health.Shards = status.Shards
+	health.Guilds = status.NumGuilds
 }
