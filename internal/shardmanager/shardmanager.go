@@ -348,7 +348,7 @@ func (m *Manager) statusRoutine() {
 			m.RUnlock()
 			if after {
 				m.Lock()
-				m.nextStatusUpdate = time.Now().Add(10 * time.Second)
+				m.nextStatusUpdate = time.Now().Add(time.Minute)
 				m.Unlock()
 
 				nID, err := m.updateStatusMessage(mID)
