@@ -38,6 +38,7 @@ func main() {
 	manager := shardmanager.New("Bot " + os.Getenv("TOKEN"))
 	session := gateway.CreateSessionWithShardManager(manager)
 
+	session.ShardManager.StatusMessageChannel = os.Getenv("SHARD_STATUS")
 	session.ShardManager.LogChannel = os.Getenv("MANAGER_LOG")
 
 	logrus.Info("Starting the shard manager")
