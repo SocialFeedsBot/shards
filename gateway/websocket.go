@@ -280,6 +280,7 @@ func (s *Session) Connect() error {
 	c, _, err := websocket.Dial(s.wsCtx, s.URL, nil)
 	if err != nil {
 		logrus.Error(err)
+		s.reconnect()
 		return err
 	}
 	s.wsConn = c

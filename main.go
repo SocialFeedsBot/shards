@@ -63,14 +63,6 @@ func main() {
 }
 
 func startStatInterval(manager *shardmanager.Manager) {
-	/*
-
-		req, err := http.NewRequest("GET", "http://example.com", nil)
-		// ...
-		req.Header.Add("If-None-Match", `W/"wyzzy"`)
-		resp, err := client.Do(req)
-	*/
-
 	client := &http.Client{}
 
 	ticker := time.NewTicker(60 * time.Second)
