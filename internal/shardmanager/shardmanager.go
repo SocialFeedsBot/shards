@@ -104,6 +104,16 @@ func (m *Manager) SetNumShards(n int) {
 	m.numShards = n
 }
 
+// Reshard disconnects shards and reconnects with a new recommended count
+func (m *Manager) Reshard() {
+	count, _ := m.GetRecommendedCount()
+	m.handleEvent(EventReshard, 0, fmt.Sprintf("Starting to reshard to from %d to %d", m.numShards, count))
+	m.StopAll()
+	m.handleEvent(EventReshard, 0, "Stopped all running shards, restarting")
+	m.numShards = count
+	m.Start()
+}
+
 // Adds an event handler to all shards
 // All event handlers will be added to new sessions automatically.
 func (m *Manager) AddHandler(handler interface{}) {
@@ -519,6 +529,9 @@ const (
 
 	// Sent when an error occurs
 	EventError
+
+	// Sent when the manager starts the reshard process
+	EventReshard
 )
 
 var (
@@ -530,6 +543,7 @@ var (
 		EventResumed:      "resumed",
 		EventReady:        "ready",
 		EventError:        "error",
+		EventReshard:      "reshard",
 	}
 
 	eventColors = map[EventType]int{
@@ -540,6 +554,7 @@ var (
 		EventResumed:      0x5985ff,
 		EventReady:        0x00ffbf,
 		EventError:        0x7a1bad,
+		EventReshard:      0xf57e42,
 	}
 )
 

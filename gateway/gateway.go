@@ -34,6 +34,7 @@ const (
 	ActionRequestServerInfo   Action = "getGuild"
 	ActionRequestSharedGuilds Action = "requestSharedGuilds"
 	ActionRequestRestart      Action = "restart"
+	ActionRequestReshard      Action = "reshard"
 )
 
 // OPCodeTypes is used to help associate each OPCode when converted to a string

@@ -193,6 +193,8 @@ func (s *Session) deploy(packet Packet) {
 				go s.GetServerInfo(packet)
 			case ActionRequestSharedGuilds:
 				go s.GetSharedGuilds(packet)
+			case ActionRequestReshard:
+				go s.ShardManager.Reshard()
 			case ActionRequestRestart:
 				s.reconnect()
 			}
