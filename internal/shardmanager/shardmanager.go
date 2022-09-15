@@ -438,7 +438,9 @@ func (m *Manager) GetFullStatus() *Status {
 	totalGuilds := 0
 	for shard, guilds := range shardGuilds {
 		totalGuilds += guilds
-		result[shard].NumGuilds = guilds
+		if result[shard] != nil {
+			result[shard].NumGuilds = guilds
+		}
 	}
 
 	return &Status{
