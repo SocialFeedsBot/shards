@@ -40,6 +40,7 @@ func main() {
 
 	session.ShardManager.StatusMessageChannel = os.Getenv("SHARD_STATUS")
 	session.ShardManager.LogChannel = os.Getenv("MANAGER_LOG")
+	session.ShardManager.SetNumShards(3)
 
 	logrus.Info("Starting the shard manager")
 	err := session.ShardManager.Start()
