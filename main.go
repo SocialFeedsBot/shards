@@ -85,11 +85,15 @@ func startStatInterval(manager *shardmanager.Manager) {
 				client.Do(topgg)
 
 				// dbl.com
-				dblValues := map[string]string{"guildCount": fmt.Sprintf("%v", guildCount)}
+				dblValues := map[string]string{"guilds": fmt.Sprintf("%v", guildCount)}
 				dblData, _ := json.Marshal(dblValues)
-				dbl, _ := http.NewRequest("POST", fmt.Sprintf("https://discord.bots.gg/api/v1/bots/%v/stats", os.Getenv("CLIENT_ID")), bytes.NewBuffer(dblData))
+				dbl, _ := http.NewRequest("POST", fmt.Sprintf("https://discordbotlist.com/api/v1/bots/%v/stats", os.Getenv("CLIENT_ID")), bytes.NewBuffer(dblData))
 				dbl.Header.Add("Authorization", os.Getenv("STATS_DBL"))
-				client.Do(dbl)
+				_, err := client.Do(dbl)
+
+				if err != nil {
+					fmt.Println(err)
+				}
 
 				// discord.bots.gg
 				dbotsValues := map[string]string{"guildCount": fmt.Sprintf("%v", guildCount)}
