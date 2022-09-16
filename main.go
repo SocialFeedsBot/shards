@@ -72,22 +72,20 @@ func startStatInterval(manager *shardmanager.Manager) {
 			select {
 			case <-ticker.C:
 				guildCount := manager.GetFullStatus().NumGuilds
-				fmt.Println("1")
+
 				// prom
 				re, _ := http.NewRequest("POST", fmt.Sprintf("%v/gauge/set/guilds/%v", os.Getenv("PROMETHEUS_URL"), guildCount), bytes.NewBufferString(""))
 				client.Do(re)
 
-				fmt.Println("2")
 				// top.gg
-				topggValues := map[string]string{"server_count": fmt.Sprintf("%v", guildCount)}
+				topggValues := Stats{ServerCount: guildCount}
 				topggData, _ := json.Marshal(topggValues)
 				topgg, _ := http.NewRequest("POST", fmt.Sprintf("https://top.gg/api/bots/%v/stats", os.Getenv("CLIENT_ID")), bytes.NewBuffer(topggData))
 				topgg.Header.Add("Authorization", os.Getenv("STATS_TOPGG"))
 				client.Do(topgg)
 
-				fmt.Println("3")
 				// dbl.com
-				dblValues := map[string]string{"guilds": fmt.Sprintf("%v", guildCount)}
+				dblValues := Stats{Guilds: guildCount}
 				dblData, _ := json.Marshal(dblValues)
 				dbl, _ := http.NewRequest("POST", fmt.Sprintf("https://discordbotlist.com/api/v1/bots/%v/stats", os.Getenv("CLIENT_ID")), bytes.NewBuffer(dblData))
 				dbl.Header.Add("Authorization", os.Getenv("STATS_DBL"))
@@ -99,9 +97,8 @@ func startStatInterval(manager *shardmanager.Manager) {
 					fmt.Println(resp)
 				}
 
-				fmt.Println("4")
 				// discord.bots.gg
-				dbotsValues := map[string]string{"guildCount": fmt.Sprintf("%v", guildCount)}
+				dbotsValues := Stats{GuildCount: guildCount}
 				dbotsData, _ := json.Marshal(dbotsValues)
 				dbots, _ := http.NewRequest("POST", fmt.Sprintf("https://discord.bots.gg/api/v1/bots/%v/stats", os.Getenv("CLIENT_ID")), bytes.NewBuffer(dbotsData))
 				dbots.Header.Add("Authorization", os.Getenv("STATS_DBOTS"))
@@ -112,4 +109,10 @@ func startStatInterval(manager *shardmanager.Manager) {
 			}
 		}
 	}()
+}
+
+type Stats struct {
+	Guilds      int `json:"guilds,omitempty"`
+	ServerCount int `json:"server_count,omitempty"`
+	GuildCount  int `json:"guildCount,omitempty"`
 }
