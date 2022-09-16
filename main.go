@@ -89,10 +89,12 @@ func startStatInterval(manager *shardmanager.Manager) {
 				dblData, _ := json.Marshal(dblValues)
 				dbl, _ := http.NewRequest("POST", fmt.Sprintf("https://discordbotlist.com/api/v1/bots/%v/stats", os.Getenv("CLIENT_ID")), bytes.NewBuffer(dblData))
 				dbl.Header.Add("Authorization", os.Getenv("STATS_DBL"))
-				_, err := client.Do(dbl)
+				resp, err := client.Do(dbl)
 
 				if err != nil {
 					fmt.Println(err)
+				} else {
+					fmt.Println(resp)
 				}
 
 				// discord.bots.gg
