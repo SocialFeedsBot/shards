@@ -371,7 +371,7 @@ func (m *Manager) statusRoutine() {
 
 func (m *Manager) updateStatusMessage(mID string) (string, error) {
 	status := m.GetFullStatus()
-	var fields []*discordgo.MessageEmbedField
+	var lines []string
 	for _, shard := range status.Shards {
 		emoji := ""
 		if !shard.Started {
@@ -381,18 +381,14 @@ func (m *Manager) updateStatusMessage(mID string) (string, error) {
 		} else {
 			emoji = "🔥"
 		}
-		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:   fmt.Sprintf("%s Shard [%d/%d]", emoji, shard.Shard+1, m.numShards),
-			Value:  fmt.Sprintf("Servers: %d -> %d", shard.NumGuilds, status.NumGuilds),
-			Inline: true,
-		})
+		lines = append(lines, fmt.Sprintf("`%s [%d/%d] %d -> %d`", emoji, shard.Shard+1, m.numShards, shard.NumGuilds, status.NumGuilds))
 	}
 
 	embed := &discordgo.MessageEmbed{
-		Title:     "SocialFeeds Shards",
-		Fields:    fields,
-		Color:     0x4286f4,
-		Timestamp: time.Now().Format(time.RFC3339),
+		Title:       "SocialFeeds Shards",
+		Description: strings.Join(lines, ""),
+		Color:       0x4286f4,
+		Timestamp:   time.Now().Format(time.RFC3339),
 	}
 
 	if mID == "" {
