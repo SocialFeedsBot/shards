@@ -381,12 +381,12 @@ func (m *Manager) updateStatusMessage(mID string) (string, error) {
 		} else {
 			emoji = "🔥"
 		}
-		lines = append(lines, fmt.Sprintf("`%s [%d/%d] %d -> %d`", emoji, shard.Shard+1, m.numShards, shard.NumGuilds, status.NumGuilds))
+		lines = append(lines, fmt.Sprintf("%s `[%d/%d]` %d -> %d", emoji, shard.Shard+1, m.numShards, shard.NumGuilds, status.NumGuilds))
 	}
 
 	embed := &discordgo.MessageEmbed{
 		Title:       "SocialFeeds Shards",
-		Description: strings.Join(lines, ""),
+		Description: strings.Join(lines, "\n"),
 		Color:       0x4286f4,
 		Timestamp:   time.Now().Format(time.RFC3339),
 	}
