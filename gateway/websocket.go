@@ -66,6 +66,7 @@ func (s *Session) send(packet interface{}) error {
 	// Other unhandled error
 	if err != nil {
 		logrus.Error(err)
+		s.reconnect()
 		return err
 	}
 	return nil
