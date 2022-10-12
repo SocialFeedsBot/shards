@@ -82,6 +82,7 @@ func startStatInterval(manager *shardmanager.Manager) {
 				topggData, _ := json.Marshal(topggValues)
 				topgg, _ := http.NewRequest("POST", fmt.Sprintf("https://top.gg/api/bots/%v/stats", os.Getenv("CLIENT_ID")), bytes.NewBuffer(topggData))
 				topgg.Header.Add("Authorization", os.Getenv("STATS_TOPGG"))
+				topgg.Header.Add("Content-Type", "application/json")
 				client.Do(topgg)
 
 				// dbl.com
@@ -89,6 +90,7 @@ func startStatInterval(manager *shardmanager.Manager) {
 				dblData, _ := json.Marshal(dblValues)
 				dbl, _ := http.NewRequest("POST", fmt.Sprintf("https://discordbotlist.com/api/v1/bots/%v/stats", os.Getenv("CLIENT_ID")), bytes.NewBuffer(dblData))
 				dbl.Header.Add("Authorization", os.Getenv("STATS_DBL"))
+				dbl.Header.Add("Content-Type", "application/json")
 				resp, err := client.Do(dbl)
 
 				if err != nil {
@@ -102,6 +104,7 @@ func startStatInterval(manager *shardmanager.Manager) {
 				dbotsData, _ := json.Marshal(dbotsValues)
 				dbots, _ := http.NewRequest("POST", fmt.Sprintf("https://discord.bots.gg/api/v1/bots/%v/stats", os.Getenv("CLIENT_ID")), bytes.NewBuffer(dbotsData))
 				dbots.Header.Add("Authorization", os.Getenv("STATS_DBOTS"))
+				dbots.Header.Add("Content-Type", "application/json")
 				client.Do(dbots)
 			case <-quit:
 				ticker.Stop()
