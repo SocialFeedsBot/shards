@@ -45,9 +45,6 @@ type Manager struct {
 	numShards int
 	token     string
 
-	nextStatusUpdate     time.Time
-	statusUpdaterStarted bool
-
 	bareSession *discordgo.Session
 	started     bool
 }
@@ -109,7 +106,6 @@ func (m *Manager) Reshard() {
 	count, _ := m.GetRecommendedCount()
 	m.handleEvent(EventReshard, 0, fmt.Sprintf("Starting to reshard to from %d to %d", m.numShards, count))
 	m.StopAll()
-	m.handleEvent(EventReshard, 0, "Stopped all running shards, restarting")
 	m.numShards = count
 	m.Start()
 }
@@ -147,13 +143,6 @@ func (m *Manager) Init() error {
 			return errors.WithMessage(err, "initSession")
 		}
 	}
-
-	if !m.statusUpdaterStarted {
-		m.statusUpdaterStarted = true
-		go m.statusRoutine()
-	}
-
-	m.nextStatusUpdate = time.Now()
 
 	m.Unlock()
 
@@ -319,89 +308,6 @@ func (m *Manager) logEventToDiscord(evt *Event) {
 
 	_, err := m.bareSession.ChannelMessageSendEmbed(m.LogChannel, embed)
 	m.handleError(err, evt.Shard, "Failed sending event to discord")
-}
-
-func (m *Manager) statusRoutine() {
-	if m.StatusMessageChannel == "" {
-		return
-	}
-
-	mID := ""
-
-	// Find the initial message id and reuse that message if found
-	msgs, err := m.bareSession.ChannelMessages(m.StatusMessageChannel, 50, "", "", "")
-	if err != nil {
-		m.handleError(err, -1, "Failed requesting message history in channel")
-	} else {
-		for _, msg := range msgs {
-			// Dunno our own bot id so best we can do is bot
-			if !msg.Author.Bot || len(msg.Embeds) < 1 {
-				continue
-			}
-
-			embed := msg.Embeds[0]
-			if embed.Title == "SocialFeeds Shards" {
-				// Found it sucessfully
-				mID = msg.ID
-				break
-			}
-		}
-	}
-
-	ticker := time.NewTicker(time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			m.RLock()
-			after := time.Now().After(m.nextStatusUpdate)
-			m.RUnlock()
-			if after {
-				m.Lock()
-				m.nextStatusUpdate = time.Now().Add(time.Minute)
-				m.Unlock()
-
-				nID, err := m.updateStatusMessage(mID)
-				if !m.handleError(err, -1, "Failed updating status message") {
-					mID = nID
-				}
-			}
-		}
-	}
-}
-
-func (m *Manager) updateStatusMessage(mID string) (string, error) {
-	status := m.GetFullStatus()
-	var lines []string
-	for _, shard := range status.Shards {
-		emoji := ""
-		if !shard.Started {
-			emoji = "🕒"
-		} else if shard.OK {
-			emoji = "👌"
-		} else {
-			emoji = "🔥"
-		}
-		lines = append(lines, fmt.Sprintf("%s `[%d/%d]` %d -> %d", emoji, shard.Shard+1, m.numShards, shard.NumGuilds, status.NumGuilds))
-	}
-
-	embed := &discordgo.MessageEmbed{
-		Title:       "SocialFeeds Shards",
-		Description: strings.Join(lines, "\n"),
-		Color:       0x4286f4,
-		Timestamp:   time.Now().Format(time.RFC3339),
-	}
-
-	if mID == "" {
-		msg, err := m.bareSession.ChannelMessageSendEmbed(m.StatusMessageChannel, embed)
-		if err != nil {
-			return "", err
-		}
-
-		return msg.ID, err
-	}
-
-	_, err := m.bareSession.ChannelMessageEditEmbed(m.StatusMessageChannel, mID, embed)
-	return mID, err
 }
 
 // GetFullStatus retrieves the full status at this instant
