@@ -18,7 +18,7 @@ type Session struct {
 	wsCtxCancel context.CancelFunc
 
 	URL    string
-	ID     string
+	ID     float64
 	Secret string
 
 	HeartbeatInterval time.Duration

@@ -17,7 +17,7 @@ var StartTime = time.Now()
 type Health struct {
 	Uptime time.Duration               `json:"uptime"` // Milliseconds
 	Memory uint64                      `json:"memory"` // This won't work on my laptop :D
-	ID     string                      `json:"id"`
+	ID     float64                     `json:"id"`
 	Guilds int                         `json:"guilds"`
 	Shards []*shardmanager.ShardStatus `json:"shards"`
 }

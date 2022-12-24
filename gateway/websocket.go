@@ -132,7 +132,7 @@ func (s *Session) deploy(packet Packet) {
 			sessionID := s.ID
 			s.Unlock()
 
-			if sessionID == "" {
+			if sessionID == 0 {
 				s.identify(OPCodeIdentify)
 			} else {
 				s.identify(OPCodeResume)
@@ -152,7 +152,7 @@ func (s *Session) deploy(packet Packet) {
 				break
 			}
 
-			sentID := data["id"].(string)
+			sentID := data["id"].(float64)
 
 			s.Lock()
 			existingSession := s.ID == sentID
@@ -267,7 +267,6 @@ func (s *Session) Connect() error {
 	// Prevent Connect or other major session functions from
 	// being called while it is still running.
 	s.Lock()
-	defer s.Unlock()
 
 	// If the websock is already open, bail out here.
 	if s.wsConn != nil {
@@ -282,9 +281,11 @@ func (s *Session) Connect() error {
 	}
 	c, _, err := websocket.Dial(s.wsCtx, s.URL, nil)
 	if err != nil {
-		logrus.Error(err)
+		logrus.Warn(err)
+		s.Unlock()
+		time.Sleep(1 * time.Second)
 		s.Connect()
-		return err
+		return nil
 	}
 	s.wsConn = c
 
@@ -296,6 +297,7 @@ func (s *Session) Connect() error {
 	s.listening = make(chan bool)
 
 	go s.listen()
+	s.Unlock()
 	return nil
 }
 

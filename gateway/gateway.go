@@ -70,9 +70,9 @@ type Packet struct {
 
 // Identify is a helper structure used to send identify payloads where ID may or may not be present
 type Identify struct {
-	Service string `json:"service"`
-	Secret  string `json:"secret"`
-	ID      string `json:"id,omitempty"`
+	Service string  `json:"service"`
+	Secret  string  `json:"secret"`
+	ID      float64 `json:"id,omitempty"`
 }
 
 // CreateSessionWithShardManager creates a new session and starts the initial websocket connection to the gateway
