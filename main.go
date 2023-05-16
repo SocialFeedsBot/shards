@@ -21,11 +21,21 @@ func main() {
 	// Format the logger
 	logger.Format()
 
-	// Load environment variables
-	e := env.Load()
-	if e != nil {
-		logrus.Error(e)
-		return
+	// Load config
+	if os.Getenv("DEV") == "true" {
+		logrus.Debug("Running in development environment")
+		e := env.Load(".env.dev")
+		if e != nil {
+			logrus.Error(e)
+			return
+		}
+	} else {
+		logrus.Debug("Running in production environment")
+		e := env.Load()
+		if e != nil {
+			logrus.Error(e)
+			return
+		}
 	}
 
 	// Connect to the gateway

@@ -5,3 +5,4 @@ dist
 .docker
 worker
 .env
+.env.dev

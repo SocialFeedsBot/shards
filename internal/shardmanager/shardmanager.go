@@ -404,7 +404,7 @@ func (c *Event) String() string {
 
 	s := fmt.Sprintf("%s%s", prefix, strings.Title(c.Type.String()))
 	if c.Msg != "" {
-		s += ": " + c.Msg
+		s += c.Msg
 	}
 
 	return s
